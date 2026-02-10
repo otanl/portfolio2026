@@ -1,31 +1,20 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { promises as fs } from 'fs';
-import path from 'path';
+import { Redis } from '@upstash/redis';
 
-const counterFilePath = path.join(process.cwd(), 'counter.txt');
+const redis = new Redis({
+	url: process.env.KV_REST_API_URL!,
+	token: process.env.KV_REST_API_TOKEN!
+});
 
-async function getCount(): Promise<number> {
-	try {
-		const data = await fs.readFile(counterFilePath, 'utf-8');
-		return parseInt(data, 10);
-	} catch {
-		return 0;
-	}
-}
-
-async function setCount(count: number): Promise<void> {
-	await fs.writeFile(counterFilePath, count.toString(), 'utf-8');
-}
+const KEY = 'portfolio:counter';
 
 export const GET: RequestHandler = async () => {
-	const count = await getCount();
+	const count = (await redis.get<number>(KEY)) ?? 0;
 	return json({ count });
 };
 
 export const POST: RequestHandler = async () => {
-	let count = await getCount();
-	count++;
-	await setCount(count);
+	const count = await redis.incr(KEY);
 	return json({ count });
 };

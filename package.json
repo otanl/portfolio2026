@@ -26,8 +26,10 @@
 		"vite": "^7.3.1"
 	},
 	"dependencies": {
+		"@sveltejs/adapter-vercel": "^6.3.1",
 		"@threlte/core": "^8.3.1",
 		"@threlte/extras": "^9.7.1",
+		"@upstash/redis": "^1.36.2",
 		"bits-ui": "^2.15.5",
 		"clsx": "^2.1.1",
 		"gray-matter": "^4.0.3",
