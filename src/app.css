@@ -695,7 +695,9 @@
 
 /* Modern: Password input - neumorphic inset */
 .modern input[type="password"],
-.modern input[type="text"] {
+.modern input[type="text"],
+.modern input[type="email"],
+.modern textarea {
 	border: none;
 	border-radius: 0.75rem;
 	background: var(--neu-bg);
@@ -705,7 +707,9 @@
 	transition: box-shadow 0.2s;
 }
 .modern input[type="password"]:focus,
-.modern input[type="text"]:focus {
+.modern input[type="text"]:focus,
+.modern input[type="email"]:focus,
+.modern textarea:focus {
 	box-shadow:
 		var(--neu-shadow-inset),
 		0 0 0 2px var(--neu-accent);

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { ThemeToggle, ChaosButton, WordArtMesh, ProjectList, ProfileCard, JobSection, PublicationsSection, PortalWindow } from '$lib/components';
+	import { ThemeToggle, ChaosButton, WordArtMesh, ProjectList, ProfileCard, JobSection, PublicationsSection, PortalWindow, ContactForm } from '$lib/components';
 	import { Button, Badge } from '$lib/components/ui';
 	import { Twitter, Github, Facebook, AppWindow } from 'lucide-svelte';
 
@@ -147,7 +147,8 @@
 	<footer id={portalMode ? undefined : "contact"} class="mt-10 border-t border-black py-8">
 		<div class="text-center">
 			<h3 class="mb-4 text-2xl font-bold">Contact</h3>
-			<div class="mt-4 flex justify-center gap-4">
+			<ContactForm accessKey="23fb1941-0392-463a-9540-8cdd3aef47f8" />
+			<div class="mt-6 flex justify-center gap-4">
 				<a href="https://twitter.com/haetoribachi" target="_blank" rel="noopener noreferrer" class="no-underline"><Twitter /></a>
 				<a href="https://github.com/otanl" target="_blank" rel="noopener noreferrer" class="no-underline"><Github /></a>
 				<a href="https://www.facebook.com/yoshiyuki.ohtani.10" target="_blank" rel="noopener noreferrer" class="no-underline"><Facebook /></a>
