@@ -1,0 +1,1019 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Hershey Simplex Font Family (English) */
+@font-face {
+	font-family: 'Hershey Simplex';
+	src: url('/fonts/AVHersheySimplexLight.ttf') format('truetype');
+	font-weight: 300;
+	font-style: normal;
+	font-display: swap;
+}
+@font-face {
+	font-family: 'Hershey Simplex';
+	src: url('/fonts/AVHersheySimplexLightItalic.ttf') format('truetype');
+	font-weight: 300;
+	font-style: italic;
+	font-display: swap;
+}
+@font-face {
+	font-family: 'Hershey Simplex';
+	src: url('/fonts/AVHersheySimplexMedium.ttf') format('truetype');
+	font-weight: 500;
+	font-style: normal;
+	font-display: swap;
+}
+@font-face {
+	font-family: 'Hershey Simplex';
+	src: url('/fonts/AVHersheySimplexMediumItalic.ttf') format('truetype');
+	font-weight: 500;
+	font-style: italic;
+	font-display: swap;
+}
+@font-face {
+	font-family: 'Hershey Simplex';
+	src: url('/fonts/AVHersheySimplexHeavy.ttf') format('truetype');
+	font-weight: 700;
+	font-style: normal;
+	font-display: swap;
+}
+@font-face {
+	font-family: 'Hershey Simplex';
+	src: url('/fonts/AVHersheySimplexHeavyItalic.ttf') format('truetype');
+	font-weight: 700;
+	font-style: italic;
+	font-display: swap;
+}
+
+/* KST32B Font Family (Japanese) */
+@font-face {
+	font-family: 'KST32B';
+	src: url('/fonts/KST32B_thin.ttf') format('truetype');
+	font-weight: 300;
+	font-style: normal;
+	font-display: swap;
+}
+@font-face {
+	font-family: 'KST32B';
+	src: url('/fonts/KST32B_regular.ttf') format('truetype');
+	font-weight: 400;
+	font-style: normal;
+	font-display: swap;
+}
+@font-face {
+	font-family: 'KST32B';
+	src: url('/fonts/KST32B_bold.ttf') format('truetype');
+	font-weight: 700;
+	font-style: normal;
+	font-display: swap;
+}
+
+@theme inline {
+	--color-background: var(--background);
+	--color-foreground: var(--foreground);
+	--color-card: var(--card);
+	--color-card-foreground: var(--card-foreground);
+	--color-popover: var(--popover);
+	--color-popover-foreground: var(--popover-foreground);
+	--color-primary: var(--primary);
+	--color-primary-foreground: var(--primary-foreground);
+	--color-secondary: var(--secondary);
+	--color-secondary-foreground: var(--secondary-foreground);
+	--color-muted: var(--muted);
+	--color-muted-foreground: var(--muted-foreground);
+	--color-accent: var(--accent);
+	--color-accent-foreground: var(--accent-foreground);
+	--color-destructive: var(--destructive);
+	--color-destructive-foreground: var(--destructive-foreground);
+	--color-border: var(--border);
+	--color-input: var(--input);
+	--color-ring: var(--ring);
+	--color-chart-1: var(--chart-1);
+	--color-chart-2: var(--chart-2);
+	--color-chart-3: var(--chart-3);
+	--color-chart-4: var(--chart-4);
+	--color-chart-5: var(--chart-5);
+	--color-sidebar: var(--sidebar);
+	--color-sidebar-foreground: var(--sidebar-foreground);
+	--color-sidebar-primary: var(--sidebar-primary);
+	--color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+	--color-sidebar-accent: var(--sidebar-accent);
+	--color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+	--color-sidebar-border: var(--sidebar-border);
+	--color-sidebar-ring: var(--sidebar-ring);
+	--radius-sm: calc(var(--radius) - 4px);
+	--radius-md: calc(var(--radius) - 2px);
+	--radius-lg: var(--radius);
+	--radius-xl: calc(var(--radius) + 4px);
+}
+
+:root {
+	/* M3 Neutral Palette (slight warm tint) */
+	--background: #e2dfe5;
+	--foreground: #1c1b1f;
+	--card: #fffbfe;
+	--card-foreground: #1c1b1f;
+	--popover: #fffbfe;
+	--popover-foreground: #1c1b1f;
+	--primary: #1c1b1f;
+	--primary-foreground: #fffbfe;
+	--secondary: #e7e0ec;
+	--secondary-foreground: #1c1b1f;
+	--muted: #f5eff4;
+	--muted-foreground: #605d62;
+	--accent: #e7e0ec;
+	--accent-foreground: #1c1b1f;
+	--destructive: #b3261e;
+	--destructive-foreground: #ffffff;
+	--border: #c9c5ca;
+	--input: #c9c5ca;
+	--ring: #787579;
+	--chart-1: oklch(0.646 0.222 41.116);
+	--chart-2: oklch(0.6 0.118 184.704);
+	--chart-3: oklch(0.398 0.07 227.392);
+	--chart-4: oklch(0.828 0.189 84.429);
+	--chart-5: oklch(0.769 0.188 70.08);
+	--radius: 0rem;
+	--sidebar: #f5eff4;
+	--sidebar-foreground: #1c1b1f;
+	--sidebar-primary: #1c1b1f;
+	--sidebar-primary-foreground: #fffbfe;
+	--sidebar-accent: #e7e0ec;
+	--sidebar-accent-foreground: #1c1b1f;
+	--sidebar-border: #c9c5ca;
+	--sidebar-ring: #787579;
+}
+
+.dark {
+	/* M3 Dark Neutral Palette */
+	--background: #2d2b31;
+	--foreground: #e6e1e5;
+	--card: #211f26;
+	--card-foreground: #e6e1e5;
+	--popover: #211f26;
+	--popover-foreground: #e6e1e5;
+	--primary: #e6e1e5;
+	--primary-foreground: #1c1b1f;
+	--secondary: #332f35;
+	--secondary-foreground: #e6e1e5;
+	--muted: #332f35;
+	--muted-foreground: #939094;
+	--accent: #332f35;
+	--accent-foreground: #e6e1e5;
+	--destructive: #601410;
+	--destructive-foreground: #f2b8b5;
+	--border: #484649;
+	--input: #484649;
+	--ring: #605d62;
+	--chart-1: oklch(0.488 0.243 264.376);
+	--chart-2: oklch(0.696 0.17 162.48);
+	--chart-3: oklch(0.769 0.188 70.08);
+	--chart-4: oklch(0.627 0.265 303.9);
+	--chart-5: oklch(0.645 0.246 16.439);
+	--sidebar: #1c1b1f;
+	--sidebar-foreground: #e6e1e5;
+	--sidebar-primary: #cbbeff;
+	--sidebar-primary-foreground: #e6e1e5;
+	--sidebar-accent: #332f35;
+	--sidebar-accent-foreground: #e6e1e5;
+	--sidebar-border: #484649;
+	--sidebar-ring: #605d62;
+}
+
+@layer base {
+	* {
+		@apply border-border;
+	}
+	html {
+		font-family: 'KST32B', 'MS PMincho', 'MS P明朝', serif;
+		@apply bg-background;
+	}
+	h1, h2, h3, h4, h5, h6 {
+		font-family: 'KST32B', 'MS Mincho', 'MS 明朝', serif;
+		font-weight: bold;
+		text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.1);
+	}
+	.retro-text {
+		font-family: 'KST32B', 'MS Mincho', 'MS 明朝', serif;
+		font-smooth: never;
+		-webkit-font-smoothing: none;
+		font-variant-numeric: tabular-nums;
+	}
+	/* 細いフォントを使いたい場合 */
+	.font-thin {
+		font-weight: 300;
+	}
+	body {
+		@apply bg-background text-foreground;
+	}
+	a {
+		color: #0000FF;
+		text-decoration: underline;
+	}
+	a:visited {
+		color: #551A8B;
+	}
+	.dark a {
+		color: #8af;
+	}
+	.dark a:visited {
+		color: #c9f;
+	}
+	.project-card img:not(.expanded) {
+		image-rendering: pixelated;
+		filter: contrast(1.2) brightness(0.8) grayscale(0.3) saturate(0.8);
+		transform: scale(0.95);
+		image-rendering: -moz-crisp-edges;
+		image-rendering: crisp-edges;
+	}
+}
+
+@layer utilities {
+	.border-outset {
+		border: 3px outset #c4c1c7;
+		box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+		background: #f0edf3;
+	}
+	.border-inset {
+		border-style: inset;
+		border-color: var(--border-3d-color);
+		border-width: 2px;
+	}
+	.text-blink {
+		animation: blink 1s step-end infinite;
+	}
+	@keyframes blink {
+		0%, 100% { opacity: 1; }
+		50% { opacity: 0; }
+	}
+	.bg-rainbow-animated {
+		background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+		background-size: 400% 400%;
+		animation: rainbow-bg 15s ease infinite;
+		border: none;
+	}
+	@keyframes rainbow-bg {
+		0% { background-position: 0% 50% }
+		50% { background-position: 100% 50% }
+		100% { background-position: 0% 50% }
+	}
+	.text-rainbow-animated {
+		background: linear-gradient(to right, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #8f00ff);
+		-webkit-background-clip: text;
+		background-clip: text;
+		color: transparent;
+		animation: rainbow 5s linear infinite;
+		background-size: 200% auto;
+	}
+	.dark .text-rainbow-animated {
+		background-image: linear-gradient(to right, #ffadad, #ffffa1, #a1ffa1, #a1a1ff, #ffa1ff, #ffadad);
+	}
+	@keyframes rainbow {
+		0% { background-position: 0% 50%; }
+		100% { background-position: 200% 50%; }
+	}
+}
+
+/* 90年代風のボタンスタイル */
+.button-3d {
+	border: 2px solid;
+	border-top-color: #f0edf3;
+	border-left-color: #f0edf3;
+	border-right-color: #1c1b1f;
+	border-bottom-color: #1c1b1f;
+	background: #d6d3d9;
+	padding: 4px 8px;
+	border-radius: 0;
+}
+
+.dark .button-3d {
+	border: 2px solid;
+	border-top-color: #4a484e;
+	border-left-color: #4a484e;
+	border-right-color: #1c1b1f;
+	border-bottom-color: #1c1b1f;
+	background: #38363c;
+	color: #e6e1e5;
+}
+
+.button-3d:active {
+	border: 2px solid;
+	border-top-color: #1c1b1f;
+	border-left-color: #1c1b1f;
+	border-right-color: #f0edf3;
+	border-bottom-color: #f0edf3;
+	background: #c4c1c7;
+}
+
+.dark .button-3d:active {
+	border-top-color: #1c1b1f;
+	border-left-color: #1c1b1f;
+	border-right-color: #4a484e;
+	border-bottom-color: #4a484e;
+	background: #2d2b31;
+}
+
+/* 画像のグレースケール効果 */
+.retro-image {
+	filter: grayscale(100%) contrast(90%) brightness(90%);
+}
+
+/* 90年代風のカード */
+.retro-card {
+	background: #f0edf3;
+	border: 2px solid #1c1b1f;
+	box-shadow: 3px 3px 0 #1c1b1f, inset 1px 1px 0 #f0edf3, inset -1px -1px 0 #c4c1c7;
+	border-radius: 0;
+}
+
+.dark .retro-card {
+	background: #38363c;
+	border: 2px solid #4a484e;
+	box-shadow: 3px 3px 0 #1c1b1f, inset 1px 1px 0 #4a484e, inset -1px -1px 0 #1e1c22;
+	color: #e6e1e5;
+}
+
+/* プロジェクトカード専用のアニメーション */
+.project-card {
+	transition: transform 0.1s ease;
+}
+
+.project-card:hover {
+	transform: translate(-1px, -1px);
+}
+
+.project-card:active {
+	transform: translate(1px, 1px);
+	box-shadow: 1px 1px 0 #1c1b1f, inset 1px 1px 0 #f0edf3, inset -1px -1px 0 #c4c1c7;
+}
+
+.dark .project-card:active {
+	box-shadow: 1px 1px 0 #1c1b1f, inset 1px 1px 0 #4a484e, inset -1px -1px 0 #1e1c22;
+}
+
+/* 星マーカー */
+.star-marker {
+	position: relative;
+	padding-left: 1.5em;
+}
+
+.star-marker::before {
+	content: "★";
+	position: absolute;
+	left: 0;
+	color: #ff0;
+	text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+	animation: twinkle 1s infinite;
+}
+
+@keyframes twinkle {
+	0%, 100% { opacity: 1; }
+	50% { opacity: 0.5; }
+}
+
+/* 工事中バナー */
+.under-construction {
+	background: repeating-linear-gradient(
+		45deg,
+		#ff0 0px,
+		#ff0 20px,
+		#000 20px,
+		#000 40px
+	);
+	color: red;
+	text-shadow: 2px 2px 0 #fff;
+	padding: 10px;
+	text-align: center;
+	font-weight: bold;
+	margin: 20px auto;
+	max-width: 600px;
+	border: 4px solid #000;
+	box-shadow: 4px 4px 0 #000;
+}
+
+.construction-emoji {
+	animation: blink 1s infinite;
+	display: inline-block;
+}
+
+/* イタリック文字のスタイル */
+.retro-italic {
+	font-style: italic;
+	color: #800080;
+	text-shadow: 1px 1px 0 #fff;
+}
+
+/* マーキーアニメーション */
+.marquee-content {
+	display: inline-block;
+	white-space: nowrap;
+	animation: marquee 10s linear infinite;
+}
+
+@keyframes marquee {
+	0% {
+		transform: translateX(100%);
+	}
+	100% {
+		transform: translateX(-100%);
+	}
+}
+
+/* ===== Liquid Glass Header (iOS/macOS-style) ===== */
+
+.liquid-glass-header {
+}
+
+/* Layer 1: Distorted backdrop (the core liquid glass effect) */
+.liquid-glass-effect {
+	position: absolute;
+	z-index: 0;
+	inset: 0;
+	backdrop-filter: blur(3px);
+	-webkit-backdrop-filter: blur(3px);
+	filter: url(#glass-distortion);
+	overflow: hidden;
+	isolation: isolate;
+}
+
+/* Layer 2: Tinted overlay */
+.liquid-glass-tint {
+	position: absolute;
+	z-index: 1;
+	inset: 0;
+	background: rgba(255, 255, 255, 0.25);
+}
+
+/* Layer 3: Glass edge shine */
+.liquid-glass-shine {
+	position: absolute;
+	z-index: 2;
+	inset: 0;
+	overflow: hidden;
+	box-shadow:
+		inset 2px 2px 1px 0 rgba(255, 255, 255, 0.5),
+		inset -1px -1px 1px 1px rgba(255, 255, 255, 0.5);
+}
+
+/* Content */
+.liquid-glass-inner {
+	position: relative;
+	z-index: 3;
+}
+
+/* ===== Dark Mode ===== */
+.dark .liquid-glass-header {
+}
+
+.dark .liquid-glass-tint {
+	background: rgba(255, 255, 255, 0.08);
+}
+
+.dark .liquid-glass-shine {
+	box-shadow:
+		inset 2px 2px 1px 0 rgba(255, 255, 255, 0.15),
+		inset -1px -1px 1px 1px rgba(255, 255, 255, 0.1);
+}
+
+/* =====================================================
+   Modern / Neumorphism Style
+   ===================================================== */
+
+/* Neumorphism CSS variables */
+.modern {
+	--neu-bg: #e2dfe5;
+	--neu-light: #f0edf3;
+	--neu-dark: #c4c1c7;
+	--neu-shadow:
+		6px 6px 12px var(--neu-dark),
+		-6px -6px 12px var(--neu-light);
+	--neu-shadow-sm:
+		3px 3px 6px var(--neu-dark),
+		-3px -3px 6px var(--neu-light);
+	--neu-shadow-inset:
+		inset 3px 3px 6px var(--neu-dark),
+		inset -3px -3px 6px var(--neu-light);
+	--neu-shadow-button:
+		4px 4px 8px var(--neu-dark),
+		-4px -4px 8px var(--neu-light),
+		inset 0 1px 1px rgba(255,255,255,0.3),
+		inset 0 -1px 1px rgba(0,0,0,0.05);
+	--neu-accent: hsl(15, 85%, 58%);
+	--radius: 1rem;
+}
+
+.modern.dark {
+	--neu-bg: #2d2b31;
+	--neu-light: #3a383e;
+	--neu-dark: #1e1c22;
+	--neu-shadow:
+		6px 6px 12px var(--neu-dark),
+		-6px -6px 12px var(--neu-light);
+	--neu-shadow-sm:
+		3px 3px 6px var(--neu-dark),
+		-3px -3px 6px var(--neu-light);
+	--neu-shadow-inset:
+		inset 3px 3px 6px var(--neu-dark),
+		inset -3px -3px 6px var(--neu-light);
+	--neu-shadow-button:
+		4px 4px 8px var(--neu-dark),
+		-4px -4px 8px var(--neu-light),
+		inset 0 1px 1px rgba(255,255,255,0.08),
+		inset 0 -1px 1px rgba(0,0,0,0.1);
+}
+
+/* Modern: Typography - clean sans-serif */
+.modern html,
+.modern .retro-text {
+	font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif;
+	font-smooth: auto;
+	-webkit-font-smoothing: antialiased;
+}
+
+.modern h1, .modern h2, .modern h3, .modern h4, .modern h5, .modern h6 {
+	font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif;
+	text-shadow: none;
+	letter-spacing: -0.02em;
+}
+
+/* Modern: Links */
+.modern a {
+	color: var(--neu-accent, hsl(15, 85%, 58%));
+	text-decoration: none;
+	transition: opacity 0.2s;
+}
+.modern a:visited {
+	color: var(--neu-accent, hsl(15, 85%, 58%));
+	opacity: 0.8;
+}
+.modern a:hover {
+	opacity: 0.7;
+}
+
+/* Modern: Cards - neumorphic */
+.modern .retro-card {
+	background: var(--neu-bg);
+	border: none;
+	border-radius: 1.5rem;
+	box-shadow: var(--neu-shadow);
+	transition: box-shadow 0.3s, background 0.3s;
+}
+
+.modern.dark .retro-card {
+	background: var(--neu-bg);
+	border: none;
+	box-shadow: var(--neu-shadow);
+	color: var(--foreground);
+}
+
+/* Modern: Project card hover */
+.modern .project-card {
+	transition: box-shadow 0.3s, transform 0.3s;
+}
+.modern .project-card:hover {
+	transform: translateY(-2px);
+	box-shadow:
+		8px 8px 16px var(--neu-dark),
+		-8px -8px 16px var(--neu-light);
+}
+.modern .project-card:active,
+.modern.dark .project-card:active {
+	transform: translateY(0);
+	box-shadow: var(--neu-shadow-inset);
+}
+
+/* Modern: Buttons - neumorphic */
+.modern .button-3d {
+	border: none;
+	border-radius: 0.75rem;
+	background: var(--neu-bg);
+	box-shadow: var(--neu-shadow-button);
+	color: var(--foreground);
+	padding: 8px 16px;
+	transition: box-shadow 0.2s;
+}
+
+.modern.dark .button-3d {
+	border: none;
+	background: var(--neu-bg);
+	box-shadow: var(--neu-shadow-button);
+	color: var(--foreground);
+}
+
+.modern .button-3d:active,
+.modern.dark .button-3d:active {
+	border: none;
+	box-shadow: var(--neu-shadow-inset);
+	background: var(--neu-bg);
+}
+
+/* Modern: Images - clean with soft shadow */
+.modern .retro-image {
+	filter: none;
+	border-radius: 50%;
+	border: none;
+	box-shadow: var(--neu-shadow-sm);
+}
+
+/* Modern: Hide retro elements */
+.modern .under-construction {
+	display: none;
+}
+.modern .marquee-content {
+	animation: none;
+	display: block;
+	white-space: normal;
+}
+.modern .text-blink {
+	animation: none;
+}
+.modern .text-rainbow-animated {
+	background: none;
+	-webkit-background-clip: unset;
+	background-clip: unset;
+	color: var(--foreground);
+	animation: none;
+}
+.modern .construction-emoji {
+	display: none;
+}
+
+/* Modern: Star markers - clean dots */
+.modern .star-marker {
+	padding-left: 0;
+}
+.modern .star-marker::before {
+	display: none;
+}
+
+/* Modern: Retro italic - clean style */
+.modern .retro-italic {
+	color: var(--muted-foreground);
+	text-shadow: none;
+}
+
+/* Modern: Header - keep liquid glass, refine edges */
+.modern .liquid-glass-header {
+	border-bottom: none;
+}
+
+/* Modern: Horizontal rules */
+.modern hr {
+	border-color: transparent;
+	height: 0;
+	margin-top: 2rem;
+	margin-bottom: 2rem;
+}
+
+/* Modern: Profile card image */
+.modern .retro-image.border-2 {
+	border: none;
+}
+
+/* Modern: Publications section borders */
+.modern #publications li {
+	border-color: var(--neu-dark);
+}
+
+/* Modern: Inset sections (about, skills, etc.) */
+.modern section[id] {
+	padding: 2rem;
+}
+
+/* Modern: Footer */
+.modern footer {
+	border-color: transparent;
+}
+.modern footer a {
+	opacity: 0.7;
+	transition: opacity 0.2s;
+}
+.modern footer a:hover {
+	opacity: 1;
+}
+
+/* Modern: Password input - neumorphic inset */
+.modern input[type="password"],
+.modern input[type="text"] {
+	border: none;
+	border-radius: 0.75rem;
+	background: var(--neu-bg);
+	box-shadow: var(--neu-shadow-inset);
+	color: var(--foreground);
+	outline: none;
+	transition: box-shadow 0.2s;
+}
+.modern input[type="password"]:focus,
+.modern input[type="text"]:focus {
+	box-shadow:
+		var(--neu-shadow-inset),
+		0 0 0 2px var(--neu-accent);
+}
+
+/* Modern: GIF visibility */
+.modern .retro-only {
+	display: none !important;
+}
+
+/* Retro: Modern-only elements hidden */
+.modern-only {
+	display: none;
+}
+.modern .modern-only {
+	display: inline-block;
+}
+
+/* Modern: Header fixes */
+.modern .liquid-glass-header {
+	border-bottom: none;
+}
+.modern .liquid-glass-inner {
+	padding-top: 0.75rem;
+	padding-bottom: 0.75rem;
+}
+.modern .liquid-glass-inner h1 {
+	font-size: 1.25rem;
+	letter-spacing: -0.02em;
+}
+.modern .liquid-glass-inner nav {
+	gap: 0.75rem;
+}
+.modern .liquid-glass-inner nav a {
+	padding: 0.25rem 0.5rem;
+	border-radius: 0.5rem;
+	text-decoration: none;
+	color: var(--foreground);
+	opacity: 0.7;
+	transition: opacity 0.2s, background 0.2s;
+}
+.modern .liquid-glass-inner nav a:visited {
+	color: var(--foreground);
+}
+.modern .liquid-glass-inner nav a:hover {
+	opacity: 1;
+	background: var(--neu-light);
+}
+
+/* Modern: Profile card sidebar adjustments */
+.modern .retro-card hr {
+	border-color: var(--neu-dark);
+	opacity: 0.3;
+}
+
+/* Modern: Project card image - clean style */
+.modern .project-card img:not(.expanded) {
+	image-rendering: auto;
+	filter: none;
+	transform: none;
+}
+
+/* ==========================================================
+   Portal-modern: neumorphic visuals WITHOUT any layout changes.
+   Used by the portal window lens effect.
+   Rules here must NEVER change display/visibility/padding/margin/
+   font-family/font-size or any property that affects element sizing.
+   ========================================================== */
+.portal-modern {
+	--neu-bg: #e2dfe5;
+	--neu-light: #f0edf3;
+	--neu-dark: #c4c1c7;
+	--neu-shadow: 6px 6px 12px var(--neu-dark), -6px -6px 12px var(--neu-light);
+	--neu-shadow-sm: 3px 3px 6px var(--neu-dark), -3px -3px 6px var(--neu-light);
+	--neu-shadow-button:
+		4px 4px 8px var(--neu-dark), -4px -4px 8px var(--neu-light),
+		inset 0 1px 1px rgba(255,255,255,0.3), inset 0 -1px 1px rgba(0,0,0,0.05);
+	--neu-accent: hsl(15, 85%, 58%);
+	background: var(--neu-bg);
+	color: #444;
+}
+
+/* Cards: neumorphic look, keep border-width for layout */
+.portal-modern .retro-card {
+	background: var(--neu-bg);
+	border-color: transparent !important;
+	border-radius: 1.5rem;
+	box-shadow: var(--neu-shadow);
+}
+.portal-modern .retro-card hr {
+	border-color: rgba(0,0,0,0.08) !important;
+}
+
+/* Buttons / badges */
+.portal-modern .button-3d {
+	background: var(--neu-bg);
+	border-color: transparent !important;
+	border-radius: 0.75rem;
+	box-shadow: var(--neu-shadow-button);
+	color: #444;
+}
+
+/* Profile image */
+.portal-modern .retro-image {
+	filter: none;
+	border-radius: 50%;
+	border-color: transparent !important;
+	box-shadow: var(--neu-shadow-sm);
+}
+
+/* Horizontal rules: invisible but still occupy space */
+.portal-modern > hr,
+.portal-modern hr.border-black {
+	border-color: transparent !important;
+}
+
+/* Links */
+.portal-modern a {
+	color: var(--neu-accent);
+}
+
+/* Under-construction: neumorphic style in portal */
+.portal-modern .under-construction {
+	position: relative;
+	isolation: isolate;
+	background: var(--neu-bg) !important;
+	border-color: transparent !important;
+	border-radius: 1rem;
+	box-shadow: var(--neu-shadow);
+	color: #666;
+	text-shadow: none;
+}
+.portal-modern .under-construction::before {
+	content: '';
+	position: absolute;
+	inset: 5px;
+	border-radius: 0.7rem;
+	background: repeating-linear-gradient(
+		45deg,
+		#e2ff00 0px, #e2ff00 20px,
+		var(--neu-bg) 20px, var(--neu-bg) 40px
+	);
+	pointer-events: none;
+	z-index: -1;
+}
+.portal-modern .construction-emoji {
+	animation: none !important;
+}
+
+/* Kill animations but keep elements in flow */
+.portal-modern .text-blink {
+	animation: none !important;
+}
+.portal-modern .text-rainbow-animated {
+	animation: none !important;
+	background: none !important;
+	-webkit-background-clip: unset !important;
+	background-clip: unset !important;
+	color: #444;
+}
+.portal-modern .marquee-content {
+	animation: none !important;
+}
+
+/* Star markers: hide pseudo-element */
+.portal-modern .star-marker::before {
+	display: none;
+}
+
+/* Italic accent text */
+.portal-modern .retro-italic {
+	text-shadow: none;
+	color: #888;
+}
+
+/* Retro-only elements: hide GIFs, show icons instead */
+.portal-modern .retro-only {
+	visibility: hidden;
+}
+.portal-modern img.retro-only {
+	display: none;
+}
+.portal-modern li > .retro-only {
+	width: 0;
+	overflow: hidden;
+}
+.portal-modern .modern-only {
+	display: inline-block;
+}
+
+/* Footer border */
+.portal-modern footer {
+	border-color: transparent !important;
+}
+
+/* Project card images */
+.portal-modern .project-card img:not(.expanded) {
+	image-rendering: auto;
+	filter: none;
+	transform: none;
+}
+
+/* Password input */
+.portal-modern input[type="password"],
+.portal-modern input[type="text"] {
+	border-color: transparent;
+	border-radius: 0.75rem;
+	background: var(--neu-bg);
+	box-shadow: inset 3px 3px 6px var(--neu-dark), inset -3px -3px 6px var(--neu-light);
+	color: #444;
+}
+
+/* Embedded content: ambient placeholder in portal */
+.portal-modern iframe {
+	visibility: hidden !important;
+}
+.portal-modern div:has(> iframe) {
+	position: relative;
+	border-radius: 0.5rem;
+	overflow: hidden;
+	background: var(--neu-bg) !important;
+	box-shadow:
+		var(--neu-shadow-inset),
+		inset 0 0 0 1.5px rgba(226, 255, 0, 0.15);
+}
+.portal-modern div:has(> iframe)::before {
+	content: '';
+	position: absolute;
+	inset: -16px;
+	z-index: 1;
+	background:
+		radial-gradient(circle, rgba(226, 255, 0, 0.5) 0%, transparent 60%),
+		radial-gradient(circle, rgba(232, 93, 42, 0.3) 0%, transparent 55%),
+		radial-gradient(circle, rgba(196, 193, 199, 0.55) 0%, transparent 65%);
+	background-size: 50% 55%, 35% 40%, 60% 65%;
+	background-repeat: no-repeat;
+	filter: blur(16px);
+	animation: portal-metaball 14s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+	pointer-events: none;
+}
+.portal-modern div:has(> iframe)::after {
+	content: '▶';
+	position: absolute;
+	inset: 0;
+	z-index: 2;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 1.5rem;
+	color: rgba(28, 27, 31, 0.22);
+	pointer-events: none;
+}
+@keyframes portal-metaball {
+	0%, 100% { background-position: 15% 20%, 70% 65%, 55% 40%; }
+	25%      { background-position: 65% 10%, 20% 50%, 40% 75%; }
+	50%      { background-position: 45% 65%, 60% 15%, 15% 50%; }
+	75%      { background-position: 20% 40%, 50% 70%, 75% 20%; }
+}
+
+/* Dark mode ambient */
+:root.dark .portal-modern div:has(> iframe) {
+	box-shadow:
+		var(--neu-shadow-inset),
+		inset 0 0 0 1.5px rgba(184, 204, 0, 0.12);
+}
+:root.dark .portal-modern div:has(> iframe)::before {
+	background:
+		radial-gradient(circle, rgba(184, 204, 0, 0.4) 0%, transparent 60%),
+		radial-gradient(circle, rgba(232, 93, 42, 0.22) 0%, transparent 55%),
+		radial-gradient(circle, rgba(58, 56, 62, 0.55) 0%, transparent 65%);
+}
+:root.dark .portal-modern div:has(> iframe)::after {
+	color: rgba(230, 225, 229, 0.18);
+}
+
+/* Maximized portal: show real iframes, hide placeholders */
+.portal-maximized iframe {
+	visibility: visible !important;
+}
+.portal-maximized div:has(> iframe)::before,
+.portal-maximized div:has(> iframe)::after {
+	display: none;
+}
+
+/* Dark mode */
+:root.dark .portal-modern {
+	--neu-bg: #2d2b31;
+	--neu-light: #3a383e;
+	--neu-dark: #1e1c22;
+	--neu-shadow: 6px 6px 12px var(--neu-dark), -6px -6px 12px var(--neu-light);
+	--neu-shadow-sm: 3px 3px 6px var(--neu-dark), -3px -3px 6px var(--neu-light);
+	--neu-shadow-button:
+		4px 4px 8px var(--neu-dark), -4px -4px 8px var(--neu-light),
+		inset 0 1px 1px rgba(255,255,255,0.08), inset 0 -1px 1px rgba(0,0,0,0.1);
+	background: var(--neu-bg);
+	color: #ddd;
+}
+:root.dark .portal-modern .under-construction { color: #aaa; }
+:root.dark .portal-modern .under-construction::before {
+	background: repeating-linear-gradient(
+		45deg,
+		#b8cc00 0px, #b8cc00 20px,
+		var(--neu-bg) 20px, var(--neu-bg) 40px
+	);
+}
+:root.dark .portal-modern .text-rainbow-animated { color: #ddd; }
+:root.dark .portal-modern .button-3d { color: #ddd; }
+:root.dark .portal-modern .retro-italic { color: #888; }
+:root.dark .portal-modern input[type="password"],
+:root.dark .portal-modern input[type="text"] { color: #ddd; }
+
