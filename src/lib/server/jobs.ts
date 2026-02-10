@@ -1,20 +1,16 @@
-import fs from 'fs';
-import path from 'path';
 import matter from 'gray-matter';
 import type { Project } from '$lib/types';
 
-const jobsDirectory = path.join(process.cwd(), 'src/content/jobs');
+const mdModules = import.meta.glob('/src/content/jobs/*.md', {
+	query: '?raw',
+	eager: true
+}) as Record<string, { default: string }>;
 
 export function getJobs(): Project[] {
-	const fileNames = fs.readdirSync(jobsDirectory);
-
-	const jobs = fileNames
-		.filter((fileName) => fileName.endsWith('.md'))
-		.map((fileName) => {
-			const slug = fileName.replace(/\.md$/, '');
-			const fullPath = path.join(jobsDirectory, fileName);
-			const fileContents = fs.readFileSync(fullPath, 'utf8');
-			const { data, content } = matter(fileContents);
+	const jobs = Object.entries(mdModules)
+		.map(([filePath, mod]) => {
+			const slug = filePath.split('/').pop()!.replace(/\.md$/, '');
+			const { data, content } = matter(mod.default);
 
 			let images: string[] = [];
 			if (Array.isArray(data.images)) {
