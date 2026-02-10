@@ -921,9 +921,11 @@
 	transform: none;
 }
 
-/* Password input */
+/* Form inputs */
 .portal-modern input[type="password"],
-.portal-modern input[type="text"] {
+.portal-modern input[type="text"],
+.portal-modern input[type="email"],
+.portal-modern textarea {
 	border-color: transparent;
 	border-radius: 0.75rem;
 	background: var(--neu-bg);
@@ -1028,5 +1030,7 @@
 :root.dark .portal-modern .button-3d { color: #ddd; }
 :root.dark .portal-modern .retro-italic { color: #888; }
 :root.dark .portal-modern input[type="password"],
-:root.dark .portal-modern input[type="text"] { color: #ddd; }
+:root.dark .portal-modern input[type="text"],
+:root.dark .portal-modern input[type="email"],
+:root.dark .portal-modern textarea { color: #ddd; }
 
