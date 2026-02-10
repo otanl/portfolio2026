@@ -437,6 +437,15 @@
 	isolation: isolate;
 }
 
+/* Firefox fallback: SVG filter + backdrop-filter combo doesn't work reliably */
+@-moz-document url-prefix() {
+	.liquid-glass-effect {
+		filter: none;
+		backdrop-filter: blur(12px) saturate(1.4);
+		-webkit-backdrop-filter: blur(12px) saturate(1.4);
+	}
+}
+
 /* Layer 2: Tinted overlay */
 .liquid-glass-tint {
 	position: absolute;
