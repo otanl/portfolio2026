@@ -245,7 +245,7 @@
 
 <!-- Header -->
 <header class="liquid-glass-header fixed left-0 right-0 top-0 z-50">
-	<div class="liquid-glass-effect"></div>
+	<div class="liquid-glass-effect" style="filter: url(#glass-distortion)"></div>
 	<div class="liquid-glass-tint"></div>
 	<div class="liquid-glass-shine"></div>
 	<div class="liquid-glass-inner flex flex-wrap items-center justify-between gap-2 px-4 py-3">
