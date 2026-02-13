@@ -308,10 +308,15 @@
 		'アクセスが拒否されました',
 	];
 
-	function handleHelp() {
+	function showBsod() {
+		bsod = true;
+		if (contentEl) contentEl.scrollTop = 0;
+		setTimeout(() => { bsod = false; }, 4000);
+	}
+
+	function showCrash() {
 		if (variant === 'vista') {
-			bsod = true;
-			setTimeout(() => { bsod = false; }, 4000);
+			showBsod();
 		} else {
 			const count = 5 + Math.floor(Math.random() * 4);
 			for (let i = 0; i < count; i++) {
@@ -325,6 +330,20 @@
 				}, i * 80);
 			}
 		}
+	}
+
+	function handleView() {
+		if (maximized) { showCrash(); return; }
+		glassEffect = !glassEffect;
+	}
+
+	function handleEdit() {
+		if (maximized) { showCrash(); return; }
+		glitchEffect = !glitchEffect;
+	}
+
+	function handleHelp() {
+		showCrash();
 	}
 
 	function dismissAllErrors() {
@@ -468,9 +487,9 @@
 				<!-- svelte-ignore a11y_no_static_element_interactions -->
 				<span class="win-menu-item" onclick={handleFileOpen}>File</span>
 				<!-- svelte-ignore a11y_no_static_element_interactions -->
-				<span class="win-menu-item" class:win-menu-active={glitchEffect} onclick={() => glitchEffect = !glitchEffect}>Edit</span>
+				<span class="win-menu-item" class:win-menu-active={glitchEffect} onclick={handleEdit}>Edit</span>
 				<!-- svelte-ignore a11y_no_static_element_interactions -->
-				<span class="win-menu-item" class:win-menu-active={glassEffect} onclick={() => glassEffect = !glassEffect}>View</span>
+				<span class="win-menu-item" class:win-menu-active={glassEffect} onclick={handleView}>View</span>
 				<!-- svelte-ignore a11y_no_static_element_interactions -->
 				<span class="win-menu-item" onclick={handleHelp}>Help</span>
 			</div>

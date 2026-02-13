@@ -163,7 +163,8 @@
 </svelte:head>
 
 <!-- SVG filter for liquid glass (ref: lucasromerodb/liquid-glass-effect-macos) -->
-<svg style="display: none" aria-hidden="true">
+<svg style="position: absolute; width: 0; height: 0" aria-hidden="true">
+	<defs>
 	<filter id="glass-distortion" x="-2%" y="0%" width="104%" height="100%" filterUnits="objectBoundingBox">
 		<feTurbulence type="fractalNoise" baseFrequency="0.01 0.01" numOctaves="1" seed="5" result="turbulence" />
 		<feComponentTransfer in="turbulence" result="mapped">
@@ -240,7 +241,7 @@
 			<feFuncB type="discrete" tableValues="0 1"/>
 		</feComponentTransfer>
 	</filter>
-
+	</defs>
 </svg>
 
 <!-- Header -->
