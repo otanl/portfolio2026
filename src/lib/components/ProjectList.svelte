@@ -79,9 +79,12 @@
 			{@const carouselItems = getCarouselItems(project)}
 			{@const slideIndex = currentSlideIndex[project.slug] || 0}
 			{@const currentItem = carouselItems[slideIndex]}
-			<button
-				type="button"
+			<!-- svelte-ignore a11y_no_static_element_interactions -->
+			<!-- svelte-ignore a11y_click_events_have_key_events -->
+			<div
 				onclick={() => toggleProject(project.slug)}
+				role="button"
+				tabindex="0"
 				class={cn(
 					'group cursor-pointer text-left transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]',
 					isSelected ? 'md:col-span-2 lg:col-span-3' : 'col-span-1'
@@ -201,7 +204,7 @@
 						</div>
 					{/if}
 				</Card>
-			</button>
+			</div>
 		{/each}
 	</div>
 </section>
