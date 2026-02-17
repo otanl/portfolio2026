@@ -155,11 +155,13 @@
 								</div>
 							{:else}
 								{@const firstImage = carouselItems.find(item => item.type === 'image')}
-								{@const previewSrc = firstImage?.src || project.thumbnail}
+								{@const previewSrc = project.thumbnail || firstImage?.src}
 								{#if previewSrc}
 									<img
 										src={getLowResUrl(previewSrc)}
 										alt={project.title}
+										loading="lazy"
+										decoding="async"
 										class="h-full w-full object-cover grayscale-[25%] blur-[0.5px] brightness-75 transition-all duration-500 group-hover:scale-105 group-hover:grayscale group-hover:contrast-[800%] group-hover:brightness-75"
 									/>
 								{:else}
