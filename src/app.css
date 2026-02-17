@@ -187,6 +187,8 @@
 	}
 	html {
 		font-family: 'KST32B', 'MS PMincho', 'MS P明朝', serif;
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
 		@apply bg-background;
 	}
 	h1, h2, h3, h4, h5, h6 {
