@@ -1,4 +1,4 @@
-<script lang="ts">
+﻿<script lang="ts">
 	import AccessCounter from './AccessCounter.svelte';
 	import { ChevronRight } from 'lucide-svelte';
 
@@ -22,7 +22,7 @@
 		alt="Profile"
 		class="modern-only retro-image mx-auto mb-4 h-32 w-32 border-2 border-black"
 	/>
-	<p class="text-center font-bold">大谷芳之</p>
+	<p class="text-center font-bold">大谷 佳之</p>
 	<p class="text-center text-xs">Yoshiyuki Ootani</p>
 
 	<hr class="my-4 border-black" />
@@ -60,14 +60,14 @@
 		<div class="mt-4 text-center">
 			<img
 				src="https://www.gif-mania.net/animated-gif/counter/counter-7.gif"
-				alt="訪問者カウンター"
+				alt="アクセスカウンター"
 				class="retro-only mx-auto"
 			/>
 			<p class="mt-2 text-sm">あなたは</p>
 			<AccessCounter readOnly={counterReadOnly} />
-			<p class="text-sm">番目のお客様です</p>
+			<p class="text-sm">番目の訪問者です</p>
 			<p class="retro-only mt-2 text-xs text-red-600">
-				キリ番踏んだらカキコ<br />踏み逃げ厳禁！
+				キリ番を踏んだらカキコ<br />お願いします！
 			</p>
 		</div>
 	{/if}

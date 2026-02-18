@@ -46,7 +46,7 @@
 
 {#snippet pageContent(portalMode: boolean)}
 	<div class="under-construction">
-		<span class="construction-emoji">圦</span> 縺薙・繧ｵ繧､繝医・蟾･莠倶ｸｭ縺ｧ縺・<span class="construction-emoji">圦</span><br />
+		<span class="construction-emoji">🚧</span> このサイトは工事中です <span class="construction-emoji">🚧</span><br />
 		<span class="retro-italic">Sorry, This site is Japanese Only!</span>
 	</div>
 
@@ -65,18 +65,18 @@
 
 			<!-- Hero Section -->
 			<section class="retro-card py-8 text-center">
-				<WordArtMesh text="縺翫♀縺溘↓縺ｮ繝昴・繝医ヵ繧ｩ繝ｪ繧ｪ" fontPath="/fonts/GenEi POPle Black_Regular.json" follower={portalMode} />
+				<WordArtMesh text="おおたにのポートフォリオ" fontPath="/fonts/GenEi POPle Black_Regular.json" follower={portalMode} />
 				<p class="retro-italic mt-2">Media Art Programmer</p>
 				<p class="mx-auto mt-4 max-w-2xl">
-					繝｡繝・ぅ繧｢繧｢繝ｼ繝育ｳｻ縺ｮ繝励Ο繧ｰ繝ｩ繝槭・縺ｧ縺吶・
+					メディアアート領域を中心に活動するプログラマーです。
 				</p>
 				<div class="mt-4 overflow-hidden">
-					<div class="marquee-content text-blink text-rainbow-animated text-2xl font-bold italic" style="font-family: 'MS Gothic', '・ｭ・ｳ 繧ｴ繧ｷ繝・け', 'MS UI Gothic', monospace;">
-						繝帙・繝繝壹・繧ｸ縺ｸ繧医≧縺薙◎・√ｆ縺｣縺上ｊ縺励※縺・▲縺ｦ縺ｭ・・
+					<div class="marquee-content text-blink text-rainbow-animated text-2xl font-bold italic" style="font-family: 'MS Gothic', 'MS ゴシック', 'MS UI Gothic', monospace;">
+						ホームページへようこそ。ゆっくり見ていってください。
 					</div>
 				</div>
 				<div class="mt-6">
-					<Button variant="outline" class="button-3d" onclick={() => window.location.href = '#contact'}>縺雁撫縺・粋繧上○</Button>
+					<Button variant="outline" class="button-3d" onclick={() => window.location.href = '#contact'}>お問い合わせ</Button>
 				</div>
 			</section>
 
@@ -86,16 +86,16 @@
 			<section id={portalMode ? undefined : "about"} class="retro-card p-4 py-12">
 				<h3 class="mb-8 text-center text-3xl font-bold">About</h3>
 				<div class="space-y-4">
-					<p><strong>1995蟷ｴ逕溘∪繧・/strong> / 逾槫･亥ｷ晉恁讓ｪ豬懷ｸょ・霄ｫ</p>
+					<p><strong>1995年生まれ</strong> / 神奈川県横浜市出身</p>
 
 					<h4 class="mt-6 font-bold">蟄ｦ豁ｴ繝ｻ閨ｷ豁ｴ</h4>
 					<ul class="ml-4 list-inside list-disc space-y-2">
-						<li>讓ｪ豬懷嵜遶句､ｧ蟄ｦ 逅・ｷ･蟄ｦ驛ｨ 蟒ｺ遽蛾・蟶ゅ・迺ｰ蠅・ｳｻ蟄ｦ遘・蜊呈･ｭ</li>
-						<li>諠・ｱ遘大ｭｦ闃ｸ陦灘､ｧ蟄ｦ髯｢螟ｧ蟄ｦ 繝｡繝・ぅ繧｢陦ｨ迴ｾ遐皮ｩｶ遘・菫ｮ莠・/li>
-						<li>譬ｪ蠑丈ｼ夂､ｾGOCCO. (2021-2023)</li>
-						<li>譌･譛ｬ邱丞粋繝薙ず繝阪せ蟆る摩蟄ｦ譬｡ 髱槫ｸｸ蜍､隰帛ｸｫ (2022)</li>
-						<li>螟壽束鄒手｡灘､ｧ蟄ｦ 繝｡繝・ぅ繧｢闃ｸ陦薙さ繝ｼ繧ｹ遐皮ｩｶ螳､ 髱槫ｸｸ蜍､蝌ｱ險・(2023-2024)</li>
-						<li>譬ｪ蠑丈ｼ夂､ｾ繝槭・繝悶Ν (2024-)</li>
+						<li>横浜国立大学 都市科学部 建築学科 卒業</li>
+						<li>情報科学芸術大学院大学 メディア表現研究科 修了</li>
+						<li>株式会社GOCCO. (2021-2023)</li>
+						<li>日本総合ビジネス専門学校 非常勤講師 (2022)</li>
+						<li>多摩美術大学 メディア芸術コース研究室 非常勤嘱託 (2023-2024)</li>
+						<li>株式会社マーブル (2024-)</li>
 					</ul>
 				</div>
 			</section>
