@@ -3,10 +3,42 @@
 	import { writable, type Writable } from 'svelte/store';
 
 	interface Props {
+		lang?: 'ja' | 'en';
 		accessKey?: string;
 	}
 
-	let { accessKey = '' }: Props = $props();
+	let { lang = 'ja', accessKey = '' }: Props = $props();
+
+	const t = $derived(lang === 'ja'
+		? {
+			subjectSuffix: 'さんからのお問い合わせ',
+			successTitle: '送信完了しました！',
+			successDesc: 'お問い合わせありがとうございます。',
+			back: '戻る',
+			name: 'お名前',
+			namePlaceholder: '山田太郎',
+			email: 'メールアドレス',
+			message: 'メッセージ',
+			messagePlaceholder: 'お問い合わせ内容をご記入ください',
+			error: '送信に失敗しました。時間をおいて再度お試しください。',
+			sending: '送信中...',
+			send: '送信する'
+		}
+		: {
+			subjectSuffix: 'sent a message from portfolio',
+			successTitle: 'Message sent!',
+			successDesc: 'Thank you for your inquiry.',
+			back: 'Back',
+			name: 'Name',
+			namePlaceholder: 'John Doe',
+			email: 'Email',
+			message: 'Message',
+			messagePlaceholder: 'Please enter your message',
+			error: 'Failed to send. Please try again later.',
+			sending: 'Sending...',
+			send: 'Send'
+		}
+	);
 
 	type FormState = {
 		name: string;
@@ -55,7 +87,7 @@
 					name: formState.name,
 					email: formState.email,
 					message: formState.message,
-					subject: `[Portfolio] ${formState.name}さんからのお問い合わせ`
+					subject: `[Portfolio] ${formState.name} ${t.subjectSuffix}`
 				})
 			});
 
@@ -77,28 +109,28 @@
 <div class="mx-auto mt-6 max-w-md text-left">
 	{#if formState.status === 'success'}
 		<div class="retro-card p-4 text-center">
-			<p class="text-lg font-bold">送信完了しました！</p>
-			<p class="mt-2 text-sm">お問い合わせありがとうございます。</p>
+			<p class="text-lg font-bold">{t.successTitle}</p>
+			<p class="mt-2 text-sm">{t.successDesc}</p>
 			<button class="button-3d mt-4 px-4 py-2" onclick={resetForm}>
-				戻る
+				{t.back}
 			</button>
 		</div>
 	{:else}
 		<form onsubmit={handleSubmit} class="space-y-4">
 			<div>
-				<label for="contact-name" class="mb-1 block text-sm font-bold">お名前</label>
+				<label for="contact-name" class="mb-1 block text-sm font-bold">{t.name}</label>
 				<input
 					id="contact-name"
 					type="text"
 					value={formState.name}
 					oninput={(e) => updateField('name', e.currentTarget.value)}
 					required
-					placeholder="山田太郎"
+					placeholder={t.namePlaceholder}
 					class="w-full border-2 border-black px-3 py-2"
 				/>
 			</div>
 			<div>
-				<label for="contact-email" class="mb-1 block text-sm font-bold">メールアドレス</label>
+				<label for="contact-email" class="mb-1 block text-sm font-bold">{t.email}</label>
 				<input
 					id="contact-email"
 					type="email"
@@ -110,20 +142,20 @@
 				/>
 			</div>
 			<div>
-				<label for="contact-message" class="mb-1 block text-sm font-bold">メッセージ</label>
+				<label for="contact-message" class="mb-1 block text-sm font-bold">{t.message}</label>
 				<textarea
 					id="contact-message"
 					value={formState.message}
 					oninput={(e) => updateField('message', e.currentTarget.value)}
 					required
 					rows={4}
-					placeholder="お問い合わせ内容をご記入ください"
+					placeholder={t.messagePlaceholder}
 					class="w-full border-2 border-black px-3 py-2"
 				></textarea>
 			</div>
 
 			{#if formState.status === 'error'}
-				<p class="text-sm text-red-600">送信に失敗しました。時間をおいて再度お試しください。</p>
+				<p class="text-sm text-red-600">{t.error}</p>
 			{/if}
 
 			<button
@@ -132,7 +164,7 @@
 				disabled={formState.status === 'sending'}
 			>
 				<Send size={16} />
-				{formState.status === 'sending' ? '送信中...' : '送信する'}
+				{formState.status === 'sending' ? t.sending : t.send}
 			</button>
 		</form>
 	{/if}

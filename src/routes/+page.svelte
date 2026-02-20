@@ -1,4 +1,5 @@
 ﻿<script lang="ts">
+	import { onMount } from 'svelte';
 	import { ThemeToggle, ChaosButton, WordArtMesh, ProjectList, ProfileCard, JobSection, PublicationsSection, PortalWindow, ContactForm } from '$lib/components';
 	import { Button, Badge } from '$lib/components/ui';
 	import { Twitter, Github, Facebook, AppWindow, Menu, X } from 'lucide-svelte';
@@ -11,6 +12,7 @@
 	let nextId = $state(1);
 	let topZ = $state(41);
 	let mobileMenuOpen = $state(false);
+	let lang = $state<'ja' | 'en'>('ja');
 	let portalWindows = $state<{ id: number; variant: WinVariant; x: number; y: number; w: number; h: number; z: number }[]>([
 		{ id: 0, variant: randomVariant(), x: 40, y: 120, w: 340, h: 320, z: 40 }
 	]);
@@ -39,6 +41,99 @@
 		portalWindows = portalWindows.filter(w => w.id !== id);
 	}
 
+	const t = $derived(lang === 'ja'
+		? {
+			underConstruction: 'このサイトは工事中です',
+			browse: '鋭意工事中。完成までしばしお待ちを。',
+			profileSummary: 'メディアアート領域を中心に活動するプログラマーです。',
+			marquee: 'ホームページへようこそ。ゆっくりしていってね！！',
+			contactCta: 'お問い合わせ',
+			aboutHeading: 'About',
+			careerHeading: '学歴・職歴',
+			bio: '1995年生まれ / 神奈川県横浜市出身',
+			contactHeading: 'お問い合わせ',
+			careerItems: [
+				'横浜国立大学 理工学部 建築・都市環境系学科 卒業',
+				'情報科学芸術大学院大学 メディア表現研究科 修了',
+				'株式会社GOCCO. (2021-2023)',
+				'日本総合ビジネス専門学校 非常勤講師 (2022)',
+				'多摩美術大学 メディア芸術コース研究室 非常勤嘱託 (2023-2024)',
+				'株式会社マーブル (2024-)'
+			]
+		}
+		: {
+			underConstruction: 'This site is under construction',
+			browse: 'Now updating by hand, one tag at a time.',
+			profileSummary: 'I am a programmer working mainly in media art.',
+			marquee: 'Welcome to my website. Please enjoy your visit.',
+			contactCta: 'Contact',
+			aboutHeading: 'About',
+			careerHeading: 'Education & Work Experience',
+			bio: 'Born in 1995 / From Yokohama, Kanagawa, Japan',
+			contactHeading: 'Contact',
+			careerItems: [
+				'Yokohama National University, Faculty of Engineering Science, Department of Architecture and Urban Environment (B.A.)',
+				'Institute of Advanced Media Arts and Sciences, Media Expression (MFA)',
+				'GOCCO. Inc. (2021-2023)',
+				'Part-time Lecturer, Nihon Sogo Business Senmon Gakko (Japanese Vocational School) (2022)',
+				'Part-time Research Assistant, Tama Art University, Media Art Course Lab (2023-2024)',
+				'Marble Corp. (2024-)'
+			]
+		}
+	);
+
+	const projectTranslations: Record<string, { description: string; content: string }> = {
+		'01-culture-technique-of-your-life': {
+			description: 'With the rapid development of technology, services and products are emerging that challenge conventional values. This project explores what possibilities cell-culture technologies might bring into everyday life through stories, products, and media art simulations focused on intimacy, marriage, and bereavement.',
+			content: `As technology advances, new services and products are emerging that can shake conventional values.\nWhat possibilities could cell-culture technologies, already successful in medicine and livestock industries, bring to our daily lives?\n\nFocusing on the theme of "how we connect with loved ones," this project spotlights life events such as intimacy, marriage, and bereavement, and simulates imagined futures from research papers through stories, products, and media art.\n\nHow would we feel if ethically uncomfortable ideas appeared with vivid physical reality?\nA possible future of culture technology in your life.\n\nThis project is a collaboration between Academimic, which seeks new forms of research output beyond papers and conferences, and PxCell, which explores a society connected through cells.\n\nDate: Jan 12-14, 2024, 10:00-20:00\nVenue: Shibuya Kinro Fukushi Kaikan 2F, Japanese-style room\n\n[Details](https://academimic.com/cy)`
+		},
+		'02-1jFqVljvPqrWnndUMzYIlm': {
+			description: 'A visual novel game for iOS/Android. Interaction is mostly tap-based, while the game extends into QR codes, Google Docs, and websites as part of the experience.',
+			content: `A visual novel game for iOS/Android.\nThe basic interaction is tapping, while players enjoy operations that jump to QR codes, Google Docs, and websites.\n\nDirection: Raku Asao\nSystem: Yoshiyuki Ootani\nScenario: Kohei Ooike\n\n[KAMIGAME Creator Evolution 2023 Finalist](https://kamigame-evo.com/2)\n[App Store](https://apps.apple.com/sa/app/%E3%81%B5%E3%81%8C%E3%81%84%E3%81%AA%E3%81%84%E7%A9%BA%E3%81%AE%E8%A1%97/id6474100473)`
+		},
+		'03-pxcell': {
+			description: 'A project aiming to imagine a world where human cells can be exchanged. By prototyping products with blockchain, it examines ownership, unauthorized collection, and rule-making around genetic material.',
+			content: `This project explores a world in which human cells can be bought and sold.\nBy productizing cells as fan goods, charms, or mementos using blockchain technology, we investigate potential issues and opportunities including unauthorized genetic sampling, cell ownership, and related technical challenges, then develop rule-making proposals.\n\nProject Lead: Ryuto Kawamata\nEngineer: Yoshiyuki Ootani\nDesigner: Naoto Nakamura\n\n[100BANCH Garage Program #72](https://100banch.com/projects/cybor-ichiba)\n[Blockcerts verification prototype](https://blockcerts-verifier.vercel.app/)`
+		},
+		'04-ext': {
+			description: 'An installation using original PS1 software and a circuit-bending device that physically disrupts it, exploring real-time retro game materiality beyond nostalgia.',
+			content: `An installation work combining original PS1 software and a circuit-bending device that destroys it.\nThe 3D visuals rendered under hardware constraints are disrupted independently of user input and eventually freeze.\nThis is an attempt to explore the real-time nature of retro games from a perspective different from pure retro nostalgia, within a modding culture that does not separate hardware and software.\n\n[Tama Art University Assistant Exhibition 2023](https://www2.tamabi.ac.jp/yuga/within-campus/2638/)\n[GitHub](https://github.com/gameguys-jp/EXT)`
+		},
+		'05-game-guys': {
+			description: 'A DJ/VJ performance unit using retro games as instruments and visuals.',
+			content: `A DJ/VJ performance unit using retro games.\nOotani: VJ, software, hardware\nKawamata: DJ, composition\n\nAppearances:\n[2021.02.20 - NxPC.Live Vol.47 ](https://www.youtube.com/live/7LAeQY35Wa4?si=bMR_KmMffDeOhAYe)\n[2020.02.23 - NxPC.LIVE Vol.42 “IAMAS2020 Graduation Exhibition” ](https://youtu.be/lMPSitKIpt4?si=Sms7u0e2K221j1sM)\n[2019.12.20 - NxPC.Live vol.38 & freq KID x IAMAS LIVE](https://www.youtube.com/live/OckMlmBX8pM?si=qzcu0Vmqx7HzKNbL)\n[2019.11.06 - Interim Report Edition4](https://interim-report.org/edition4/)\n[2019.09.30 - LPPT vol.3](https://www.iamas.ac.jp/activity/lppt-vol-3/)\n[2019.07.27 - NxPC.Lab Vol.37 #OPENHOUSE](https://youtu.be/LXadnSdjupk?si=OkrfjCwgj5NwRScr)\n[2019.06.11 - NxPC.Live New Generation2019](https://www.youtube.com/watch?v=nDU0NOBvOWI)`
+		},
+		'06-5FIMBhHQYkalGJ3PDy8Xy6': {
+			description: 'Operation of an internet rap community, with research and practice on the possibilities and rule-making of online communities under capitalist realism (master thesis).',
+			content: `Operation of an internet rap community.\nResearch and practice on the possibilities of online communities under capitalist realism, and on their rule-making.\n\n[Master thesis](https://drive.google.com/file/d/1G_YtC4CaIcQUBjA4O0gNtkOYOcP81bvO/view?usp=sharing)`
+		},
+		'07-architectual-works-2014-2018': {
+			description: 'Portfolio from architecture school years (2014-2018).',
+			content: `Portfolio from architecture school years (2014-2018).\n\n[docswell](https://www.docswell.com/s/4096262/ZQ84J7-2023-11-06-154509)`
+		}
+	};
+
+	const localizedProjects = $derived(
+		lang === 'en'
+			? data.projects.map((project) => {
+				const translated = projectTranslations[project.slug];
+				return translated
+					? { ...project, description: translated.description, content: translated.content }
+					: project;
+			})
+			: data.projects
+	);
+
+	onMount(() => {
+		const saved = localStorage.getItem('lang');
+		if (saved === 'ja' || saved === 'en') lang = saved;
+	});
+
+	function toggleLang() {
+		lang = lang === 'ja' ? 'en' : 'ja';
+		localStorage.setItem('lang', lang);
+	}
+
 	function closeMobileMenu() {
 		mobileMenuOpen = false;
 	}
@@ -46,37 +141,36 @@
 
 {#snippet pageContent(portalMode: boolean)}
 	<div class="under-construction">
-		<span class="construction-emoji">🚧</span> このサイトは工事中です <span class="construction-emoji">🚧</span><br />
-		<span class="retro-italic">Sorry, This site is Japanese Only!</span>
+		<span class="construction-emoji">🚧</span> {t.underConstruction} <span class="construction-emoji">🚧</span><br />
+		<span class="retro-italic">{t.browse}</span>
 	</div>
 
 	<div class="mt-20 flex gap-8">
 		<!-- Sidebar -->
 		<aside class="hidden w-48 pr-4 md:block">
-			<ProfileCard showCounter={true} counterReadOnly={portalMode} />
+			<ProfileCard lang={lang} showCounter={true} counterReadOnly={portalMode} />
 		</aside>
 
 		<!-- Main Content -->
 		<div class="min-w-0 flex-1">
 			<!-- Mobile-only Profile Section -->
 			<div class="mb-8 md:hidden">
-				<ProfileCard />
+				<ProfileCard lang={lang} />
 			</div>
 
 			<!-- Hero Section -->
 			<section class="retro-card py-8 text-center">
 				<WordArtMesh text="おおたにのポートフォリオ" fontPath="/fonts/GenEi POPle Black_Regular.json" follower={portalMode} />
-				<p class="retro-italic mt-2">Media Art Programmer</p>
 				<p class="mx-auto mt-4 max-w-2xl">
-					メディアアート領域を中心に活動するプログラマーです。
+					{t.profileSummary}
 				</p>
 				<div class="mt-4 overflow-hidden">
 					<div class="marquee-content text-blink text-rainbow-animated text-2xl font-bold italic" style="font-family: 'MS Gothic', 'MS ゴシック', 'MS UI Gothic', monospace;">
-						ホームページへようこそ。ゆっくり見ていってください。
+						{t.marquee}
 					</div>
 				</div>
 				<div class="mt-6">
-					<Button variant="outline" class="button-3d" onclick={() => window.location.href = '#contact'}>お問い合わせ</Button>
+					<Button variant="outline" class="button-3d" onclick={() => window.location.href = '#contact'}>{t.contactCta}</Button>
 				</div>
 			</section>
 
@@ -84,18 +178,15 @@
 
 			<!-- About Section -->
 			<section id={portalMode ? undefined : "about"} class="retro-card p-4 py-12">
-				<h3 class="mb-8 text-center text-3xl font-bold">About</h3>
+				<h3 class="mb-8 text-center text-3xl font-bold">{t.aboutHeading}</h3>
 				<div class="space-y-4">
-					<p><strong>1995年生まれ</strong> / 神奈川県横浜市出身</p>
+					<p>{t.bio}</p>
 
-					<h4 class="mt-6 font-bold">学歴・職歴</h4>
+					<h4 class="mt-6 font-bold">{t.careerHeading}</h4>
 					<ul class="ml-4 list-inside list-disc space-y-2">
-						<li>横浜国立大学 都市科学部 建築学科 卒業</li>
-						<li>情報科学芸術大学院大学 メディア表現研究科 修了</li>
-						<li>株式会社GOCCO. (2021-2023)</li>
-						<li>日本総合ビジネス専門学校 非常勤講師 (2022)</li>
-						<li>多摩美術大学 メディア芸術コース研究室 非常勤嘱託 (2023-2024)</li>
-						<li>株式会社マーブル (2024-)</li>
+						{#each t.careerItems as item}
+							<li>{item}</li>
+						{/each}
 					</ul>
 				</div>
 			</section>
@@ -124,21 +215,21 @@
 
 			<!-- Projects Section -->
 			<div class="retro-card p-4">
-				<ProjectList projects={data.projects} />
+				<ProjectList projects={localizedProjects} />
 			</div>
 
 			<hr class="my-12 border-black" />
 
 			<!-- Jobs Section (password protected) -->
 			<div id={portalMode ? undefined : "jobs"} class="retro-card p-4">
-				<JobSection />
+				<JobSection lang={lang} />
 			</div>
 
 			<hr class="my-12 border-black" />
 
 			<!-- Publications Section -->
 			<div class="retro-card p-4">
-				<PublicationsSection />
+				<PublicationsSection lang={lang} />
 			</div>
 		</div>
 	</div>
@@ -151,8 +242,8 @@
 	<!-- Footer -->
 	<footer id={portalMode ? undefined : "contact"} class="mt-10 border-t border-black py-8">
 		<div class="text-center">
-			<h3 class="mb-4 text-2xl font-bold">Contact</h3>
-			<ContactForm accessKey="23fb1941-0392-463a-9540-8cdd3aef47f8" />
+			<h3 class="mb-4 text-2xl font-bold">{t.contactHeading}</h3>
+			<ContactForm lang={lang} accessKey="23fb1941-0392-463a-9540-8cdd3aef47f8" />
 			<div class="mt-6 flex justify-center gap-4">
 				<a href="https://twitter.com/haetoribachi" target="_blank" rel="noopener noreferrer" class="no-underline"><Twitter /></a>
 				<a href="https://github.com/otanl" target="_blank" rel="noopener noreferrer" class="no-underline"><Github /></a>
@@ -254,12 +345,23 @@
 	<div class="liquid-glass-effect" style="filter: url(#glass-distortion)"></div>
 	<div class="liquid-glass-tint"></div>
 	<div class="liquid-glass-shine"></div>
-	<div class="liquid-glass-inner px-4 py-3">
-		<div class="flex items-center justify-between gap-2">
-			<h1 class="text-xl font-bold sm:text-2xl">Yoshiyuki Ootani</h1>
-			<div class="flex items-center gap-1 sm:gap-2">
+	<div class="liquid-glass-inner px-4">
+		<div class="header-row flex items-center gap-3">
+			<h1 class="shrink-0 text-lg font-bold sm:text-xl">Yoshiyuki Ootani</h1>
+			<nav class="header-nav hidden min-w-0 flex-1 items-center justify-center gap-1 text-sm md:flex">
+				<a href="#about" class="star-marker">About</a>
+				<a href="#skills" class="star-marker">Skills</a>
+				<a href="#projects" class="star-marker">Projects</a>
+				<a href="#jobs" class="star-marker">Jobs</a>
+				<a href="#publications" class="star-marker">Publications</a>
+				<a href="#contact" class="star-marker">Contact</a>
+			</nav>
+			<div class="ml-auto flex shrink-0 items-center gap-1 sm:gap-2">
 				<Button variant="ghost" size="icon" onclick={addWindow} title="Open modern.exe">
 					<AppWindow class="h-[1.2rem] w-[1.2rem]" />
+				</Button>
+				<Button variant="outline" class="button-3d px-2 py-1 text-xs" onclick={toggleLang}>
+					{lang === 'ja' ? 'EN' : 'JP'}
 				</Button>
 				<ThemeToggle />
 				<Button
@@ -278,16 +380,8 @@
 				</Button>
 			</div>
 		</div>
-		<nav class="mt-2 hidden flex-wrap items-center gap-1 text-sm sm:gap-2 sm:text-base md:flex">
-			<a href="#about" class="star-marker">About</a>
-			<a href="#skills" class="star-marker">Skills</a>
-			<a href="#projects" class="star-marker">Projects</a>
-			<a href="#jobs" class="star-marker">Jobs</a>
-			<a href="#publications" class="star-marker">Publications</a>
-			<a href="#contact" class="star-marker">Contact</a>
-		</nav>
 		{#if mobileMenuOpen}
-			<nav class="mt-3 grid gap-2 border-t border-black/20 pt-3 text-base md:hidden">
+			<nav class="pb-3 pt-2 grid gap-2 border-t border-black/20 text-base md:hidden">
 				<a href="#about" class="star-marker" onclick={closeMobileMenu}>About</a>
 				<a href="#skills" class="star-marker" onclick={closeMobileMenu}>Skills</a>
 				<a href="#projects" class="star-marker" onclick={closeMobileMenu}>Projects</a>
@@ -300,14 +394,14 @@
 </header>
 
 <!-- Retro version (normal page) -->
-<main class="retro-text mx-auto max-w-5xl overflow-hidden px-4 pt-24">
+<main class="site-main retro-text mx-auto max-w-5xl overflow-hidden px-4">
 	{@render pageContent(false)}
 </main>
 
 <!-- Portal windows -->
 {#each portalWindows as pw (pw.id)}
 	<PortalWindow title="modern.exe" variant={pw.variant} initialX={pw.x} initialY={pw.y} initialW={pw.w} initialH={pw.h} zIndex={pw.z} onfocus={() => focusWindow(pw.id)} onclose={() => removeWindow(pw.id)}>
-		<main class="retro-text mx-auto max-w-5xl overflow-hidden px-4 pt-24">
+		<main class="site-main retro-text mx-auto max-w-5xl overflow-hidden px-4">
 			{@render pageContent(true)}
 		</main>
 	</PortalWindow>

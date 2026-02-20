@@ -143,6 +143,9 @@
 	--sidebar-accent-foreground: #1c1b1f;
 	--sidebar-border: #c9c5ca;
 	--sidebar-ring: #787579;
+	--site-header-height: 68px;
+	--site-header-mobile-height: 58px;
+	--site-header-offset: 16px;
 }
 
 .dark {
@@ -388,7 +391,7 @@
 	padding: 10px;
 	text-align: center;
 	font-weight: bold;
-	margin: 20px auto;
+	margin: 12px auto 6px;
 	max-width: 600px;
 	border: 4px solid #000;
 	box-shadow: 4px 4px 0 #000;
@@ -425,6 +428,7 @@
 /* ===== Liquid Glass Header (iOS/macOS-style) ===== */
 
 .liquid-glass-header {
+	min-height: var(--site-header-mobile-height);
 }
 
 /* Layer 1: Distorted backdrop (the core liquid glass effect) */
@@ -474,6 +478,31 @@
 .liquid-glass-inner {
 	position: relative;
 	z-index: 3;
+	padding-top: 0;
+	padding-bottom: 0;
+}
+
+.header-row {
+	min-height: var(--site-header-mobile-height);
+}
+
+.site-main {
+	padding-top: calc(var(--site-header-height) + var(--site-header-offset));
+}
+
+@media (max-width: 767px) {
+	.site-main {
+		padding-top: calc(var(--site-header-mobile-height) + var(--site-header-offset));
+	}
+}
+
+@media (min-width: 768px) {
+	.liquid-glass-header {
+		min-height: var(--site-header-height);
+	}
+	.header-row {
+		min-height: var(--site-header-height);
+	}
 }
 
 /* ===== Dark Mode ===== */
@@ -747,8 +776,8 @@
 	border-bottom: none;
 }
 .modern .liquid-glass-inner {
-	padding-top: 0.75rem;
-	padding-bottom: 0.75rem;
+	padding-top: 0;
+	padding-bottom: 0;
 }
 .modern .liquid-glass-inner h1 {
 	font-size: 1.25rem;
@@ -899,19 +928,19 @@
 	color: #888;
 }
 
-/* Retro-only elements: hide GIFs, show icons instead */
+/* Keep layout parity with retro: do not collapse or swap elements */
 .portal-modern .retro-only {
-	visibility: hidden;
+	opacity: 0;
 }
-.portal-modern img.retro-only {
+.portal-modern img.retro-only.retro-image {
 	display: none;
 }
-.portal-modern li > .retro-only {
-	width: 0;
-	overflow: hidden;
+.portal-modern img.modern-only.retro-image {
+	display: block;
+	opacity: 1;
 }
 .portal-modern .modern-only {
-	display: inline-block;
+	display: none;
 }
 
 /* Footer border */

@@ -180,7 +180,9 @@
 					<!-- タイトル・説明 -->
 					<CardContent class="pt-6">
 						<CardTitle class="retro-text">{project.title}</CardTitle>
-						<CardDescription class="mt-2">{project.description}</CardDescription>
+						{#if !isSelected}
+							<CardDescription class="mt-2">{project.description}</CardDescription>
+						{/if}
 					</CardContent>
 
 					<!-- 展開コンテンツ -->

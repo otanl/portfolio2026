@@ -37,8 +37,12 @@
 	let glassEffect = $state(false);
 	let glitchEffect = $state(false);
 	let maximized = $state(false);
+	let minTop = 48;
 	let preMaxRect = { x: 0, y: 0, w: 0, h: 0 };
 	let preMaxScrollY = 0;
+	let viewportDocX = $state(0);
+	let viewportDocY = $state(0);
+	let metricsRaf = 0;
 
 	// File → load images that bounce around the window (DVD screensaver style)
 	type BouncingImage = { id: number; x: number; y: number; vx: number; vy: number; imgW: number; imgH: number; el: HTMLDivElement | null };
@@ -180,7 +184,7 @@
 
 	// RAF loop: glitch intensity driven by mouse velocity
 	$effect(() => {
-		if (!glitchEffect) return;
+		if (!glitchEffect || maximized) return;
 
 		let animId: number;
 		let smoothScale = 5;
@@ -214,7 +218,7 @@
 
 	// RAF loop: glass breathing + position-dependent distortion
 	$effect(() => {
-		if (!glassEffect) return;
+		if (!glassEffect || maximized) return;
 
 		let animId: number;
 		let phase = 0;
@@ -268,30 +272,53 @@
 		} else {
 			preMaxRect = { x, y, w, h };
 			preMaxScrollY = window.scrollY;
+			syncHeaderOffset();
 			const pad = variant === 'win95' ? 8 : 4;
 			x = pad;
-			y = MIN_Y + pad;
+			y = minTop + pad;
 			w = window.innerWidth - pad * 2;
-			h = window.innerHeight - MIN_Y - pad * 2;
+			h = window.innerHeight - minTop - pad * 2;
 			maximized = true;
 			// Sync portal scroll to background page position
 			requestAnimationFrame(() => {
-				if (contentEl) contentEl.scrollTop = preMaxScrollY;
+				window.scrollTo(0, preMaxScrollY);
 			});
 		}
 	}
 
-	// Sync: portal scroll ↔ background page scroll while maximized
-	$effect(() => {
-		if (!maximized || !contentEl) return;
-		const el = contentEl;
-		function onPortalScroll() {
-			window.scrollTo(0, el.scrollTop);
-		}
-		el.addEventListener('scroll', onPortalScroll, { passive: true });
-		return () => el.removeEventListener('scroll', onPortalScroll);
-	});
+	function syncHeaderOffset() {
+		const header = document.querySelector('.liquid-glass-header') as HTMLElement | null;
+		const headerBottom = header ? Math.ceil(header.getBoundingClientRect().bottom) : 0;
+		minTop = Math.max(48, headerBottom + 4);
+	}
 
+	function syncMaximizedBounds() {
+		if (!maximized) return;
+		syncHeaderOffset();
+		const pad = variant === 'win95' ? 8 : 4;
+		x = pad;
+		y = minTop + pad;
+		w = window.innerWidth - pad * 2;
+		h = Math.max(MIN_H, window.innerHeight - minTop - pad * 2);
+	}
+
+	function syncViewportMetrics() {
+		if (contentEl) {
+			const rect = contentEl.getBoundingClientRect();
+			viewportDocX = rect.left + window.scrollX;
+			viewportDocY = rect.top + window.scrollY;
+		}
+	}
+
+	function scheduleMetricsSync() {
+		if (metricsRaf) return;
+		metricsRaf = requestAnimationFrame(() => {
+			metricsRaf = 0;
+			syncViewportMetrics();
+		});
+	}
+
+	// Sync: portal scroll ↔ background page scroll while maximized
 	// Help gimmick (BSOD / error cascade)
 	let bsod = $state(false);
 	let errorDialogs = $state<{ id: number; x: number; y: number; msg: string }[]>([]);
@@ -353,8 +380,6 @@
 	let dragging = $state(false);
 	let dragOffX = 0;
 	let dragOffY = 0;
-	let scrollY = $state(0);
-
 	// Resize state
 	type ResizeDir = '' | 'n' | 's' | 'e' | 'w' | 'ne' | 'nw' | 'se' | 'sw';
 	let resizing = $state<ResizeDir>('');
@@ -363,26 +388,18 @@
 	let resizeStartRect = { x: 0, y: 0, w: 0, h: 0 };
 	const MIN_W = 200;
 	const MIN_H = 150;
-	const MIN_Y = 48;
 
 	let contentEl: HTMLDivElement | undefined;
-	let chromeH = $state(0);
-	let borderW = $derived(variant === 'win95' ? 6 : 4);
 
 	onMount(() => {
-		scrollY = window.scrollY;
-
-		if (contentEl) {
-			const winEl = contentEl.closest('.win-window');
-			if (winEl) {
-				chromeH = contentEl.getBoundingClientRect().top - winEl.getBoundingClientRect().top;
-			}
-		}
+		syncHeaderOffset();
+		syncViewportMetrics();
+		let liveSyncRaf = 0;
 
 		const onMove = (cx: number, cy: number) => {
 			if (dragging) {
 				x = cx - dragOffX;
-				y = Math.max(MIN_Y, cy - dragOffY);
+				y = Math.max(minTop, cy - dragOffY);
 			} else if (resizing) {
 				const dx = cx - resizeStartX;
 				const dy = cy - resizeStartY;
@@ -402,31 +419,52 @@
 				if (resizing.includes('n')) {
 					const newH = Math.max(MIN_H, s.h - dy);
 					const newY = s.y + s.h - newH;
-					if (newY >= MIN_Y) {
+					if (newY >= minTop) {
 						y = newY;
 						h = newH;
 					}
 				}
 			}
+			scheduleMetricsSync();
 		};
 		const onUp = () => { dragging = false; resizing = ''; };
-		const onScroll = () => { scrollY = window.scrollY; };
+		const onScroll = () => { scheduleMetricsSync(); };
+		const onResize = () => {
+			syncHeaderOffset();
+			if (!maximized) y = Math.max(y, minTop);
+			syncMaximizedBounds();
+			scheduleMetricsSync();
+		};
 
 		const onMouseMove = (e: MouseEvent) => onMove(e.clientX, e.clientY);
 		const onTouchMove = (e: TouchEvent) => onMove(e.touches[0].clientX, e.touches[0].clientY);
+		const header = document.querySelector('.liquid-glass-header') as HTMLElement | null;
+		const headerObserver = header ? new ResizeObserver(onResize) : null;
+		if (headerObserver && header) headerObserver.observe(header);
 
 		window.addEventListener('mousemove', onMouseMove);
 		window.addEventListener('mouseup', onUp);
 		window.addEventListener('touchmove', onTouchMove, { passive: true });
 		window.addEventListener('touchend', onUp);
 		window.addEventListener('scroll', onScroll, { passive: true });
+		window.addEventListener('resize', onResize, { passive: true });
+
+		const liveSync = () => {
+			syncViewportMetrics();
+			liveSyncRaf = requestAnimationFrame(liveSync);
+		};
+		liveSync();
 
 		return () => {
+			if (metricsRaf) cancelAnimationFrame(metricsRaf);
+			if (liveSyncRaf) cancelAnimationFrame(liveSyncRaf);
+			headerObserver?.disconnect();
 			window.removeEventListener('mousemove', onMouseMove);
 			window.removeEventListener('mouseup', onUp);
 			window.removeEventListener('touchmove', onTouchMove);
 			window.removeEventListener('touchend', onUp);
 			window.removeEventListener('scroll', onScroll);
+			window.removeEventListener('resize', onResize);
 		};
 	});
 
@@ -458,8 +496,6 @@
 		resizeStartRect = { x, y, w, h };
 	}
 
-	let contentX = $derived(x + borderW);
-	let contentY = $derived(y + chromeH);
 </script>
 
 {#if visible}
@@ -499,15 +535,15 @@
 
 			<!-- svelte-ignore a11y_no_static_element_interactions -->
 			<div class="win-content" class:win-content-maximized={maximized} bind:this={contentEl} onmousemove={handleContentMouseMove} onwheel={handleContentWheel}>
-				{#if children && chromeH > 0}
+				{#if children}
 					<div
 						class="portal-viewport portal-modern"
 						class:portal-maximized={maximized}
-						class:glitch-active={glitchEffect}
-						style="
-							{maximized ? '' : `left: ${-contentX}px; top: ${-(contentY + scrollY)}px; width: 100vw;`}
-							{!maximized && activeFilter ? `filter: ${activeFilter};` : ''}
-						"
+						class:glitch-active={!maximized && glitchEffect}
+						style:left={`${-viewportDocX}px`}
+						style:top={`${-viewportDocY}px`}
+						style:width={'100vw'}
+						style:filter={!maximized && activeFilter ? activeFilter : undefined}
 					>
 						{@render children()}
 					</div>
@@ -602,9 +638,9 @@
 	.win-titlebar-buttons { display: flex; }
 	.win-btn { display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 0; }
 	.win-content { flex: 1; overflow: hidden; position: relative; }
-	.win-content-maximized { overflow-y: auto; }
+	.win-content-maximized { overflow: hidden; }
 	.portal-viewport { position: absolute; pointer-events: auto; font-size: 16px; }
-	.portal-maximized { position: relative; width: 100%; }
+	.portal-maximized { width: 100vw; }
 	.resize-handle { position: absolute; z-index: 10; }
 	.resize-n  { top: -3px; left: 8px; right: 8px; height: 6px; cursor: n-resize; }
 	.resize-s  { bottom: -3px; left: 8px; right: 8px; height: 6px; cursor: s-resize; }

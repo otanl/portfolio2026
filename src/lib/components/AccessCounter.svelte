@@ -2,10 +2,11 @@
 	import { onMount } from 'svelte';
 
 	interface Props {
+		lang?: 'ja' | 'en';
 		readOnly?: boolean;
 	}
 
-	let { readOnly = false }: Props = $props();
+	let { lang = 'ja', readOnly = false }: Props = $props();
 
 	let count = $state<number | null>(null);
 
@@ -23,9 +24,11 @@
 </script>
 
 <div class="my-4 flex items-baseline justify-center gap-2">
-	<p>あなたは</p>
+	<p>{lang === 'ja' ? 'あなたは' : 'You are visitor #'}</p>
 	<p class="text-2xl font-bold">
 		{count !== null ? count.toLocaleString() : '---'}
 	</p>
-	<p>人目のお客様です</p>
+	{#if lang === 'ja'}
+		<p>人目のお客様です</p>
+	{/if}
 </div>

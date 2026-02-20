@@ -3,11 +3,23 @@
 	import { ChevronRight } from 'lucide-svelte';
 
 	interface Props {
+		lang?: 'ja' | 'en';
 		showCounter?: boolean;
 		counterReadOnly?: boolean;
 	}
 
-	let { showCounter = false, counterReadOnly = false }: Props = $props();
+	let { lang = 'ja', showCounter = false, counterReadOnly = false }: Props = $props();
+
+	const t = $derived(lang === 'ja'
+		? {
+			linkHeading: 'Link',
+			kiribann: 'キリ番を踏んだらカキコ\nお願いします！'
+		}
+		: {
+			linkHeading: 'Links',
+			kiribann: 'If you hit a lucky number,\nplease leave a message!'
+		}
+	);
 </script>
 
 <div class="retro-card p-4">
@@ -27,7 +39,7 @@
 
 	<hr class="my-4 border-black" />
 
-	<h4 class="mb-2 text-lg font-bold">Link</h4>
+	<h4 class="mb-2 text-lg font-bold">{t.linkHeading}</h4>
 	<ul class="space-y-2">
 		<li class="flex items-center gap-1">
 			<img src="/textures/arrow.gif" alt="矢印" class="retro-only inline-block h-4 w-4" />
@@ -63,11 +75,9 @@
 				alt="アクセスカウンター"
 				class="retro-only mx-auto"
 			/>
-			<p class="mt-2 text-sm">あなたは</p>
-			<AccessCounter readOnly={counterReadOnly} />
-			<p class="text-sm">番目の訪問者です</p>
+			<AccessCounter lang={lang} readOnly={counterReadOnly} />
 			<p class="retro-only mt-2 text-xs text-red-600">
-				キリ番を踏んだらカキコ<br />お願いします！
+				{@html t.kiribann.replace('\n', '<br />')}
 			</p>
 		</div>
 	{/if}
