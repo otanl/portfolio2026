@@ -22,7 +22,7 @@
 		alt="Profile"
 		class="modern-only retro-image mx-auto mb-4 h-32 w-32 border-2 border-black"
 	/>
-	<p class="text-center font-bold">大谷 佳之</p>
+	<p class="text-center font-bold">大谷芳之</p>
 	<p class="text-center text-xs">Yoshiyuki Ootani</p>
 
 	<hr class="my-4 border-black" />

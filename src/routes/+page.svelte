@@ -88,7 +88,7 @@
 				<div class="space-y-4">
 					<p><strong>1995年生まれ</strong> / 神奈川県横浜市出身</p>
 
-					<h4 class="mt-6 font-bold">蟄ｦ豁ｴ繝ｻ閨ｷ豁ｴ</h4>
+					<h4 class="mt-6 font-bold">学歴・職歴</h4>
 					<ul class="ml-4 list-inside list-disc space-y-2">
 						<li>横浜国立大学 都市科学部 建築学科 卒業</li>
 						<li>情報科学芸術大学院大学 メディア表現研究科 修了</li>
@@ -158,7 +158,7 @@
 				<a href="https://github.com/otanl" target="_blank" rel="noopener noreferrer" class="no-underline"><Github /></a>
 				<a href="https://www.facebook.com/yoshiyuki.ohtani.10" target="_blank" rel="noopener noreferrer" class="no-underline"><Facebook /></a>
 			</div>
-			<p class="mt-4">ﾂｩ 2025 Yoshiyuki Ootani. All rights reserved.</p>
+			<p class="mt-4">&copy; 2025 Yoshiyuki Ootani. All rights reserved.</p>
 		</div>
 	</footer>
 {/snippet}
