@@ -9,3 +9,4 @@ export { default as ProfileCard } from './ProfileCard.svelte';
 export { default as JobSection } from './JobSection.svelte';
 export { default as PublicationsSection } from './PublicationsSection.svelte';
 export { default as ContactForm } from './ContactForm.svelte';
+export { default as CssEditorWindow } from './CssEditorWindow.svelte';

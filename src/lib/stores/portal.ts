@@ -16,6 +16,15 @@ export const projectSelection = writable<{
 	currentSlideIndex: {}
 });
 
+/** Shared CSS editor state for portal windows */
+export const cssEditorState = writable<{
+	open: boolean;
+	css: string;
+}>({
+	open: false,
+	css: ''
+});
+
 /** Shared job section unlock state for portal sync */
 export const jobState = writable<{
 	status: 'locked' | 'loading' | 'unlocked' | 'error';

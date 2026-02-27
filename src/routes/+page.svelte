@@ -1,10 +1,10 @@
 ﻿<script lang="ts">
 	import { onMount } from 'svelte';
-	import { ThemeToggle, ChaosButton, WordArtMesh, ProjectList, ProfileCard, JobSection, PublicationsSection, PortalWindow, ContactForm } from '$lib/components';
+	import { ThemeToggle, ChaosButton, WordArtMesh, ProjectList, ProfileCard, JobSection, PublicationsSection, PortalWindow, ContactForm, CssEditorWindow } from '$lib/components';
 	import { Button, Badge } from '$lib/components/ui';
 	import { Twitter, Github, Facebook, AppWindow, Menu, X } from 'lucide-svelte';
-	import { reveal, magneticContainer, typewriter } from '$lib/actions';
-	import { projectSelection } from '$lib/stores/portal';
+	import { reveal, magneticContainer, typewriter, cursorGhost } from '$lib/actions';
+	import { projectSelection, cssEditorState } from '$lib/stores/portal';
 
 	let scrollPercent = $state(0);
 	const sectionIds = ['about', 'skills', 'projects', 'jobs', 'publications', 'contact'];
@@ -290,6 +290,9 @@
 
 <svelte:head>
 	<title>Yoshiyuki Ootani</title>
+	{#if $cssEditorState.css}
+		{@html `<style id="portal-user-css">${$cssEditorState.css}</style>`}
+	{/if}
 </svelte:head>
 
 <!-- Scroll progress bar -->
@@ -431,7 +434,7 @@
 </header>
 
 <!-- Retro version (normal page) -->
-<main class="site-main retro-text mx-auto max-w-5xl overflow-hidden px-4">
+<main class="site-main retro-text mx-auto max-w-5xl overflow-hidden px-4" use:cursorGhost>
 	{@render pageContent(false)}
 </main>
 
@@ -443,4 +446,10 @@
 		</main>
 	</PortalWindow>
 {/each}
+
+<!-- CSS Editor Window -->
+{#if $cssEditorState.open}
+	<CssEditorWindow />
+{/if}
+
 

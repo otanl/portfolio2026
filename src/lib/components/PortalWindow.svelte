@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import type { Snippet } from 'svelte';
+	import { cssEditorState } from '$lib/stores/portal';
 
 	interface Props {
 		title?: string;
@@ -361,12 +362,11 @@
 
 	function handleView() {
 		if (maximized) { showCrash(); return; }
-		glassEffect = !glassEffect;
+		glitchEffect = !glitchEffect;
 	}
 
 	function handleEdit() {
-		if (maximized) { showCrash(); return; }
-		glitchEffect = !glitchEffect;
+		cssEditorState.update((s) => ({ ...s, open: !s.open }));
 	}
 
 	function handleHelp() {
@@ -523,9 +523,9 @@
 				<!-- svelte-ignore a11y_no_static_element_interactions -->
 				<span class="win-menu-item" onclick={handleFileOpen}>File</span>
 				<!-- svelte-ignore a11y_no_static_element_interactions -->
-				<span class="win-menu-item" class:win-menu-active={glitchEffect} onclick={handleEdit}>Edit</span>
+				<span class="win-menu-item" class:win-menu-active={$cssEditorState.open} onclick={handleEdit}>Edit</span>
 				<!-- svelte-ignore a11y_no_static_element_interactions -->
-				<span class="win-menu-item" class:win-menu-active={glassEffect} onclick={handleView}>View</span>
+				<span class="win-menu-item" class:win-menu-active={glitchEffect} onclick={handleView}>View</span>
 				<!-- svelte-ignore a11y_no_static_element_interactions -->
 				<span class="win-menu-item" onclick={handleHelp}>Help</span>
 			</div>

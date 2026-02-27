@@ -1097,6 +1097,27 @@ html:not(.modern) .button-3d {
 	cursor: auto !important;
 }
 
+/* ===== Cursor ghost bug effect ===== */
+.cursor-ghost {
+	position: absolute;
+	width: 16px;
+	height: 22px;
+	pointer-events: none;
+	z-index: 9999;
+	background: url("/cursors/default.svg") no-repeat;
+	background-size: contain;
+	opacity: 0.85;
+	image-rendering: pixelated;
+}
+.cursor-ghost[data-cursor-type="pointer"] {
+	width: 15px;
+	background-image: url("/cursors/pointer.svg");
+}
+.cursor-ghost-fade {
+	opacity: 0;
+	transition: opacity 1.5s ease-out;
+}
+
 /* ===== Scroll-triggered reveal animations ===== */
 .reveal-hidden {
 	opacity: 0;
