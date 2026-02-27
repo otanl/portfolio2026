@@ -24,8 +24,28 @@
 	}
 
 	function toggleTheme() {
-		theme = theme === 'dark' ? 'light' : 'dark';
-		updateTheme();
+		const skipEffect =
+			window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
+			document.documentElement.classList.contains('modern');
+
+		if (skipEffect) {
+			theme = theme === 'dark' ? 'light' : 'dark';
+			updateTheme();
+			return;
+		}
+
+		const overlay = document.createElement('div');
+		overlay.className = 'crt-poweroff';
+		document.body.appendChild(overlay);
+
+		setTimeout(() => {
+			theme = theme === 'dark' ? 'light' : 'dark';
+			updateTheme();
+		}, 150);
+
+		setTimeout(() => {
+			overlay.remove();
+		}, 450);
 	}
 </script>
 

@@ -6,6 +6,7 @@
 	import { slide, fade, fly } from 'svelte/transition';
 	import { cubicOut } from 'svelte/easing';
 	import { projectSelection } from '$lib/stores/portal';
+	import { tilt, reveal } from '$lib/actions';
 
 	interface Props {
 		projects: Project[];
@@ -73,7 +74,7 @@
 	{#if showHeading}
 		<h2 class="mb-12 text-center text-4xl font-bold">Projects</h2>
 	{/if}
-	<div class="grid grid-cols-1 items-start gap-8 md:grid-cols-2 lg:grid-cols-3">
+	<div class="grid grid-cols-1 items-start gap-8 md:grid-cols-2 lg:grid-cols-3" use:reveal={{ stagger: 80 }}>
 		{#each projects as project (project.slug)}
 			{@const isSelected = selectedId === project.slug}
 			{@const carouselItems = getCarouselItems(project)}
@@ -82,6 +83,8 @@
 			<!-- svelte-ignore a11y_no_static_element_interactions -->
 			<!-- svelte-ignore a11y_click_events_have_key_events -->
 			<div
+				data-reveal-child
+				use:tilt={{ disabled: isSelected }}
 				onclick={() => toggleProject(project.slug)}
 				role="button"
 				tabindex="0"
@@ -105,7 +108,8 @@
 												<img
 													src={currentItem.src}
 													alt={project.title}
-													class="expanded h-auto max-h-[600px] w-full object-contain"
+													class="expanded blur-up h-auto max-h-[600px] w-full object-contain"
+													onload={(e) => (e.currentTarget as HTMLImageElement).classList.add('blur-up-loaded')}
 												/>
 											{:else if currentItem.type === 'embed'}
 												<!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->

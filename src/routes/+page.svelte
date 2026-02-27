@@ -3,6 +3,12 @@
 	import { ThemeToggle, ChaosButton, WordArtMesh, ProjectList, ProfileCard, JobSection, PublicationsSection, PortalWindow, ContactForm } from '$lib/components';
 	import { Button, Badge } from '$lib/components/ui';
 	import { Twitter, Github, Facebook, AppWindow, Menu, X } from 'lucide-svelte';
+	import { reveal, magneticContainer, typewriter } from '$lib/actions';
+	import { projectSelection } from '$lib/stores/portal';
+
+	let scrollPercent = $state(0);
+	const sectionIds = ['about', 'skills', 'projects', 'jobs', 'publications', 'contact'];
+	let currentSectionIdx = $state(-1);
 
 	let { data } = $props();
 
@@ -127,6 +133,14 @@
 	onMount(() => {
 		const saved = localStorage.getItem('lang');
 		if (saved === 'ja' || saved === 'en') lang = saved;
+
+		const onScroll = () => {
+			const doc = document.documentElement;
+			const scrollHeight = doc.scrollHeight - doc.clientHeight;
+			scrollPercent = scrollHeight > 0 ? (doc.scrollTop / scrollHeight) * 100 : 0;
+		};
+		window.addEventListener('scroll', onScroll, { passive: true });
+		return () => window.removeEventListener('scroll', onScroll);
 	});
 
 	function toggleLang() {
@@ -136,6 +150,24 @@
 
 	function closeMobileMenu() {
 		mobileMenuOpen = false;
+	}
+
+	function handleKeydown(e: KeyboardEvent) {
+		const tag = (e.target as HTMLElement)?.tagName;
+		if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+
+		if (e.key === 'j' || e.key === 'J') {
+			e.preventDefault();
+			currentSectionIdx = Math.min(currentSectionIdx + 1, sectionIds.length - 1);
+			document.getElementById(sectionIds[currentSectionIdx])?.scrollIntoView({ behavior: 'smooth' });
+		} else if (e.key === 'k' || e.key === 'K') {
+			e.preventDefault();
+			currentSectionIdx = Math.max(currentSectionIdx - 1, 0);
+			document.getElementById(sectionIds[currentSectionIdx])?.scrollIntoView({ behavior: 'smooth' });
+		} else if (e.key === 'Escape') {
+			projectSelection.update(s => s.selectedId ? { ...s, selectedId: null } : s);
+			mobileMenuOpen = false;
+		}
 	}
 </script>
 
@@ -159,9 +191,9 @@
 			</div>
 
 			<!-- Hero Section -->
-			<section class="retro-card py-8 text-center">
+			<section class="retro-card py-8 text-center" use:reveal>
 				<WordArtMesh text="おおたにのポートフォリオ" fontPath="/fonts/GenEi POPle Black_Regular.json" follower={portalMode} />
-				<p class="mx-auto mt-4 max-w-2xl">
+				<p class="mx-auto mt-4 max-w-2xl" use:typewriter={t.profileSummary}>
 					{t.profileSummary}
 				</p>
 				<div class="mt-4 overflow-hidden">
@@ -169,7 +201,7 @@
 						{t.marquee}
 					</div>
 				</div>
-				<div class="mt-6">
+				<div class="mt-6" use:magneticContainer>
 					<Button variant="outline" class="button-3d" onclick={() => window.location.href = '#contact'}>{t.contactCta}</Button>
 				</div>
 			</section>
@@ -177,7 +209,7 @@
 			<hr class="my-12 border-black" />
 
 			<!-- About Section -->
-			<section id={portalMode ? undefined : "about"} class="retro-card p-4 py-12">
+			<section id={portalMode ? undefined : "about"} class="retro-card p-4 py-12" use:reveal>
 				<h3 class="mb-8 text-center text-3xl font-bold">{t.aboutHeading}</h3>
 				<div class="space-y-4">
 					<p>{t.bio}</p>
@@ -194,20 +226,20 @@
 			<hr class="my-12 border-black" />
 
 			<!-- Skills Section -->
-			<section id={portalMode ? undefined : "skills"} class="retro-card p-4 py-12 text-center">
+			<section id={portalMode ? undefined : "skills"} class="retro-card p-4 py-12 text-center" use:reveal>
 				<h3 class="mb-8 text-3xl font-bold">Skills</h3>
-				<div class="flex flex-wrap justify-center gap-4">
-					<Badge variant="outline" class="button-3d">Unity</Badge>
-					<Badge variant="outline" class="button-3d">UnrealEngine</Badge>
-					<Badge variant="outline" class="button-3d">TouchDesigner</Badge>
-					<Badge variant="outline" class="button-3d">Houdini</Badge>
-					<Badge variant="outline" class="button-3d">Rhinoceros/Grasshopper</Badge>
-					<Badge variant="outline" class="button-3d">Python</Badge>
-					<Badge variant="outline" class="button-3d">Swift</Badge>
-					<Badge variant="outline" class="button-3d">Next.js</Badge>
-					<Badge variant="outline" class="button-3d">MicroPython</Badge>
-					<Badge variant="outline" class="button-3d">Arduino</Badge>
-					<Badge variant="outline" class="button-3d">C/C#</Badge>
+				<div class="flex flex-wrap justify-center gap-4" use:magneticContainer>
+					<Badge variant="outline" class="button-3d" data-reveal-child>Unity</Badge>
+					<Badge variant="outline" class="button-3d" data-reveal-child>UnrealEngine</Badge>
+					<Badge variant="outline" class="button-3d" data-reveal-child>TouchDesigner</Badge>
+					<Badge variant="outline" class="button-3d" data-reveal-child>Houdini</Badge>
+					<Badge variant="outline" class="button-3d" data-reveal-child>Rhinoceros/Grasshopper</Badge>
+					<Badge variant="outline" class="button-3d" data-reveal-child>Python</Badge>
+					<Badge variant="outline" class="button-3d" data-reveal-child>Swift</Badge>
+					<Badge variant="outline" class="button-3d" data-reveal-child>Next.js</Badge>
+					<Badge variant="outline" class="button-3d" data-reveal-child>MicroPython</Badge>
+					<Badge variant="outline" class="button-3d" data-reveal-child>Arduino</Badge>
+					<Badge variant="outline" class="button-3d" data-reveal-child>C/C#</Badge>
 				</div>
 			</section>
 
@@ -221,14 +253,14 @@
 			<hr class="my-12 border-black" />
 
 			<!-- Jobs Section (password protected) -->
-			<div id={portalMode ? undefined : "jobs"} class="retro-card p-4">
+			<div id={portalMode ? undefined : "jobs"} class="retro-card p-4" use:reveal>
 				<JobSection lang={lang} />
 			</div>
 
 			<hr class="my-12 border-black" />
 
 			<!-- Publications Section -->
-			<div class="retro-card p-4">
+			<div class="retro-card p-4" use:reveal>
 				<PublicationsSection lang={lang} />
 			</div>
 		</div>
@@ -254,9 +286,14 @@
 	</footer>
 {/snippet}
 
+<svelte:window onkeydown={handleKeydown} />
+
 <svelte:head>
 	<title>Yoshiyuki Ootani</title>
 </svelte:head>
+
+<!-- Scroll progress bar -->
+<div class="scroll-progress" style="--progress: {scrollPercent}%"></div>
 
 <!-- SVG filter for liquid glass (ref: lucasromerodb/liquid-glass-effect-macos) -->
 <svg style="position: absolute; width: 0; height: 0" aria-hidden="true">
@@ -356,7 +393,7 @@
 				<a href="#publications" class="star-marker">Publications</a>
 				<a href="#contact" class="star-marker">Contact</a>
 			</nav>
-			<div class="ml-auto flex shrink-0 items-center gap-1 sm:gap-2">
+			<div class="ml-auto flex shrink-0 items-center gap-1 sm:gap-2" use:magneticContainer>
 				<Button variant="ghost" size="icon" onclick={addWindow} title="Open modern.exe">
 					<AppWindow class="h-[1.2rem] w-[1.2rem]" />
 				</Button>
