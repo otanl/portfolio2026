@@ -1,7 +1,24 @@
 <script lang="ts">
-	import { onDestroy } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 	import { cssEditorState } from '$lib/stores/portal';
 	import { X } from 'lucide-svelte';
+
+	// Inject CSS via DOM so it appears after all stylesheets (beats @layer)
+	let styleEl: HTMLStyleElement | null = null;
+	onMount(() => {
+		styleEl = document.createElement('style');
+		styleEl.id = 'portal-user-css';
+		document.body.appendChild(styleEl);
+		// Apply any existing CSS
+		const unsub2 = cssEditorState.subscribe((s) => {
+			if (styleEl) styleEl.textContent = s.css;
+		});
+		return () => {
+			unsub2();
+			styleEl?.remove();
+			styleEl = null;
+		};
+	});
 
 	let x = $state(60);
 	let y = $state(80);
@@ -31,9 +48,9 @@
 
 	let borderRadius = $state(0);
 	let borderRadiusEnabled = $state(false);
-	let borderWidth = $state(2);
-	let borderWidthEnabled = $state(false);
-	let shadowSize = $state(3);
+	let cardGap = $state(32);
+	let cardGapEnabled = $state(false);
+	let shadowSize = $state(6);
 	let shadowSizeEnabled = $state(false);
 
 	let invert = $state(false);
@@ -57,6 +74,12 @@
 		const [r, g, b] = hexToRgb(hex);
 		return rgbToHex(r * (1 - amount), g * (1 - amount), b * (1 - amount));
 	}
+	/** Returns black or white depending on background luminance */
+	function contrastText(hex: string): string {
+		const [r, g, b] = hexToRgb(hex);
+		const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+		return lum > 0.5 ? '#000000' : '#ffffff';
+	}
 
 	function buildCss(): string {
 		const S = '.portal-viewport';
@@ -75,7 +98,9 @@
 		if (accentColor) {
 			vars.push(`--accent: ${accentColor}`);
 			vars.push(`--secondary: ${accentColor}`);
+			vars.push(`--secondary-foreground: ${contrastText(accentColor)}`);
 			vars.push(`--primary: ${accentColor}`);
+			vars.push(`--primary-foreground: ${contrastText(accentColor)}`);
 			vars.push(`--ring: ${accentColor}`);
 		}
 		if (borderColor) {
@@ -99,37 +124,66 @@
 			allRules.push(`${S}, ${S} * {\n  color: ${textColor} !important;\n}`);
 		}
 
-		// Card background + shadow colors derived from card/bg color
-		const shadowBase = cardBgColor || bgColor;
-		const ss = shadowSizeEnabled ? shadowSize : 3;
-		const ssBtn = Math.max(1, Math.round(ss * 0.67));
-		const ssActive = Math.max(1, Math.round(ss * 0.33));
+		// Card bg
 		if (cardBgColor) {
 			allRules.push(`${S} .retro-card,\n${S} [class*="card"] {\n  background-color: ${cardBgColor} !important;\n}`);
 		}
-		if (shadowBase || shadowSizeEnabled) {
-			const base = shadowBase || '#f0edf3';
-			const shadowDark = darken(base, 0.6);
-			const shadowMid = darken(base, 0.25);
-			const shadowLight = lighten(base, 0.3);
-			const borderBase = borderColor || textColor || darken(base, 0.5);
-			allRules.push(`${S} .retro-card {\n  box-shadow: ${ss}px ${ss}px 0 ${shadowDark}, inset 1px 1px 0 ${shadowLight}, inset -1px -1px 0 ${shadowMid} !important;\n  border-color: ${borderBase} !important;\n}`);
-			allRules.push(`${S} .project-card:active {\n  box-shadow: ${ssActive}px ${ssActive}px 0 ${shadowDark}, inset 1px 1px 0 ${shadowLight}, inset -1px -1px 0 ${shadowMid} !important;\n}`);
-			allRules.push(`${S} .button-3d {\n  box-shadow: ${ssBtn}px ${ssBtn}px 0 ${shadowDark} !important;\n  border-color: ${borderBase} !important;\n}`);
-			allRules.push(`${S} .retro-text {\n  text-shadow: 1px 1px 0 ${shadowMid} !important;\n}`);
-			if (bgColor) {
-				allRules.push(`${S} .under-construction {\n  background: repeating-linear-gradient(45deg, ${bgColor}, ${bgColor} 10px, ${darken(bgColor, 0.15)} 10px, ${darken(bgColor, 0.15)} 20px) !important;\n  color: ${textColor || '#000'} !important;\n}`);
-			}
+
+		// Neumorphic shadows — always emit when any visual property changed
+		// Shadow color is derived from the surface the element sits on:
+		//   cards/buttons sit on the background → use bgColor
+		//   if no bgColor set, fall back to defaults
+		const hasAnyChange = bgColor || cardBgColor || textColor || accentColor || linkColor || borderColor || fontFamily || fontSizeEnabled || shadowSizeEnabled;
+		if (hasAnyChange) {
+			const surfaceColor = bgColor || '#e2dfe5';
+			const cardColor = cardBgColor || bgColor || '#e2dfe5';
+			const ss = shadowSizeEnabled ? shadowSize : 6;
+			const ssHalf = Math.max(1, Math.round(ss / 2));
+			const ssBlur = ss * 2;
+			const ssBlurHalf = Math.max(1, Math.round(ssBlur / 2));
+			const sBtn = Math.round(ss * 0.67);
+			const sBtnBlur = Math.round(ssBlur * 0.67);
+
+			// Shadows for elements on the background surface
+			const bgDark = darken(surfaceColor, 0.18);
+			const bgLight = lighten(surfaceColor, 0.45);
+			const neuShadow = `${ss}px ${ss}px ${ssBlur}px ${bgDark}, -${ss}px -${ss}px ${ssBlur}px ${bgLight}`;
+			const neuShadowSm = `${ssHalf}px ${ssHalf}px ${ssBlurHalf}px ${bgDark}, -${ssHalf}px -${ssHalf}px ${ssBlurHalf}px ${bgLight}`;
+			const neuShadowBtn = `${sBtn}px ${sBtn}px ${sBtnBlur}px ${bgDark}, -${sBtn}px -${sBtn}px ${sBtnBlur}px ${bgLight}, inset 0 1px 1px rgba(255,255,255,0.3), inset 0 -1px 1px rgba(0,0,0,0.05)`;
+
+			// Inset shadow for pressed state — derived from card surface
+			const cardDark = darken(cardColor, 0.18);
+			const cardLight = lighten(cardColor, 0.45);
+			const neuShadowInset = `inset ${ssHalf}px ${ssHalf}px ${ssBlurHalf}px ${cardDark}, inset -${ssHalf}px -${ssHalf}px ${ssBlurHalf}px ${cardLight}`;
+
+			// Let shadows overflow .site-main; .win-content clips at window edge
+			allRules.push(`${S} .site-main {\n  overflow: visible !important;\n}`);
+
+			allRules.push(`${S} .retro-card {\n  border-color: transparent !important;\n  box-shadow: ${neuShadow} !important;\n}`);
+			allRules.push(`${S} .project-card:active {\n  box-shadow: ${neuShadowInset} !important;\n}`);
+			allRules.push(`${S} .button-3d {\n  background: ${cardColor} !important;\n  color: ${textColor || 'inherit'} !important;\n  border-color: transparent !important;\n  box-shadow: ${neuShadowBtn} !important;\n}`);
+			allRules.push(`${S} .retro-image {\n  box-shadow: ${neuShadowSm} !important;\n}`);
+			allRules.push(`${S} .retro-text {\n  text-shadow: none !important;\n}`);
+			allRules.push(`${S} .under-construction {\n  background: ${surfaceColor} !important;\n  border-color: transparent !important;\n  box-shadow: ${neuShadow} !important;\n  color: ${textColor || '#666'} !important;\n  text-shadow: none !important;\n}`);
 		}
 
-		// Border width
-		if (borderWidthEnabled) {
-			allRules.push(`${S} .retro-card {\n  border-width: ${borderWidth}px !important;\n}`);
+		// Card gap — override Tailwind gap via custom property + margin fallback
+		if (cardGapEnabled) {
+			allRules.push(`${S} #projects .grid {\n  --tw-gap-x: ${cardGap}px !important;\n  --tw-gap-y: ${cardGap}px !important;\n  gap: ${cardGap}px !important;\n  column-gap: ${cardGap}px !important;\n  row-gap: ${cardGap}px !important;\n}`);
 		}
 
 		// Border radius
 		if (borderRadiusEnabled) {
 			allRules.push(`${S} .retro-card,\n${S} [class*="card"],\n${S} .button-3d,\n${S} img {\n  border-radius: ${borderRadius}px !important;\n}`);
+		}
+
+		// Input/textarea — match card color
+		{
+			const inputBg = cardBgColor || bgColor;
+			if (inputBg) {
+				const inputShadow = `inset 2px 2px 4px ${darken(inputBg, 0.15)}, inset -2px -2px 4px ${lighten(inputBg, 0.4)}`;
+				allRules.push(`${S} input,\n${S} textarea,\n${S} select {\n  background: ${inputBg} !important;\n  color: ${textColor || 'inherit'} !important;\n  border-color: transparent !important;\n  box-shadow: ${inputShadow} !important;\n}`);
+			}
 		}
 
 		if (linkColor) {
@@ -141,8 +195,10 @@
 		}
 
 		if (accentColor) {
-			allRules.push(`${S} .retro-card {\n  border-color: ${accentColor} !important;\n}`);
-			allRules.push(`${S} .button-3d {\n  border-color: ${accentColor} !important;\n}`);
+			allRules.push(`${S} a.star-marker {\n  color: ${accentColor} !important;\n}`);
+			// Badge text: override the * text color rule with higher specificity
+			const badgeText = contrastText(accentColor);
+			allRules.push(`${S}${S} [class*="bg-secondary"] {\n  color: ${badgeText} !important;\n}`);
 		}
 
 		// Filters
@@ -187,9 +243,9 @@
 		lineHeightEnabled = false;
 		borderRadius = 0;
 		borderRadiusEnabled = false;
-		borderWidth = 2;
-		borderWidthEnabled = false;
-		shadowSize = 3;
+		cardGap = 32;
+		cardGapEnabled = false;
+		shadowSize = 6;
 		shadowSizeEnabled = false;
 		invert = false;
 		grayscale = false;
@@ -219,16 +275,34 @@
 		window.removeEventListener('mouseup', onDragEnd);
 	}
 
-	const fonts = [
+	// Font loading: Google Fonts are loaded on demand
+	const loadedFonts = new Set<string>();
+	function loadGoogleFont(id: string) {
+		if (loadedFonts.has(id)) return;
+		loadedFonts.add(id);
+		const link = document.createElement('link');
+		link.rel = 'stylesheet';
+		link.href = `https://fonts.googleapis.com/css2?family=${id}&display=swap`;
+		document.head.appendChild(link);
+	}
+
+	type FontEntry = { label: string; value: string; googleId?: string };
+	const fonts: FontEntry[] = [
 		{ label: 'Default', value: '' },
-		{ label: 'Comic Sans MS', value: '"Comic Sans MS", cursive' },
-		{ label: 'Courier New', value: '"Courier New", monospace' },
-		{ label: 'Impact', value: 'Impact, sans-serif' },
-		{ label: 'Times New Roman', value: '"Times New Roman", serif' },
-		{ label: 'Arial', value: 'Arial, sans-serif' },
-		{ label: 'Papyrus', value: 'Papyrus, fantasy' },
+		{ label: 'Dela Gothic One', value: '"Dela Gothic One", sans-serif', googleId: 'Dela+Gothic+One' },
+		{ label: 'DotGothic16', value: '"DotGothic16", sans-serif', googleId: 'DotGothic16' },
+		{ label: 'Shippori Mincho', value: '"Shippori Mincho", serif', googleId: 'Shippori+Mincho:wght@400;700' },
+		{ label: 'Noto Serif JP', value: '"Noto Serif JP", serif', googleId: 'Noto+Serif+JP:wght@400;700' },
+		{ label: 'Zen Maru Gothic', value: '"Zen Maru Gothic", sans-serif', googleId: 'Zen+Maru+Gothic:wght@400;700' },
+		{ label: 'M PLUS Rounded 1c', value: '"M PLUS Rounded 1c", sans-serif', googleId: 'M+PLUS+Rounded+1c:wght@400;700' },
 		{ label: 'MS Gothic', value: '"MS Gothic", monospace' },
 	];
+
+	function onFontChange() {
+		const entry = fonts.find((f) => f.value === fontFamily);
+		if (entry?.googleId) loadGoogleFont(entry.googleId);
+		applyVisual();
+	}
 
 	// Color presets (swatch-only)
 	const colorThemes = [
@@ -323,7 +397,7 @@
 				<legend>Typography</legend>
 				<label class="ed-row">
 					<span class="ed-label">Font</span>
-					<select class="ed-select" bind:value={fontFamily} onchange={applyVisual}>
+					<select class="ed-select" bind:value={fontFamily} onchange={onFontChange}>
 						{#each fonts as f}
 							<option value={f.value}>{f.label}</option>
 						{/each}
@@ -353,21 +427,21 @@
 			<fieldset class="ed-group">
 				<legend>Box</legend>
 				<label class="ed-row">
-					<input type="checkbox" bind:checked={borderWidthEnabled} onchange={applyVisual} />
-					<span class="ed-label">Border</span>
-					<input type="range" class="ed-range" min="0" max="8" bind:value={borderWidth} oninput={applyVisual} disabled={!borderWidthEnabled} />
-					<span class="ed-value">{borderWidth}px</span>
+					<input type="checkbox" bind:checked={cardGapEnabled} onchange={applyVisual} />
+					<span class="ed-label">Gap</span>
+					<input type="range" class="ed-range" min="0" max="80" bind:value={cardGap} oninput={applyVisual} disabled={!cardGapEnabled} />
+					<span class="ed-value">{cardGap}px</span>
 				</label>
 				<label class="ed-row">
 					<input type="checkbox" bind:checked={borderRadiusEnabled} onchange={applyVisual} />
 					<span class="ed-label">Radius</span>
-					<input type="range" class="ed-range" min="0" max="24" bind:value={borderRadius} oninput={applyVisual} disabled={!borderRadiusEnabled} />
+					<input type="range" class="ed-range" min="0" max="50" bind:value={borderRadius} oninput={applyVisual} disabled={!borderRadiusEnabled} />
 					<span class="ed-value">{borderRadius}px</span>
 				</label>
 				<label class="ed-row">
 					<input type="checkbox" bind:checked={shadowSizeEnabled} onchange={applyVisual} />
 					<span class="ed-label">Shadow</span>
-					<input type="range" class="ed-range" min="0" max="10" bind:value={shadowSize} oninput={applyVisual} disabled={!shadowSizeEnabled} />
+					<input type="range" class="ed-range" min="0" max="20" bind:value={shadowSize} oninput={applyVisual} disabled={!shadowSizeEnabled} />
 					<span class="ed-value">{shadowSize}px</span>
 				</label>
 			</fieldset>
@@ -597,6 +671,12 @@
 		outline: none;
 		user-select: text;
 		tab-size: 2;
+	}
+	.ed-hint {
+		font-size: 9px;
+		color: #888;
+		padding: 0 0 2px;
+		text-align: right;
 	}
 	.ed-textarea::placeholder { color: #999; }
 	.ed-status {

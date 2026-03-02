@@ -290,9 +290,6 @@
 
 <svelte:head>
 	<title>Yoshiyuki Ootani</title>
-	{#if $cssEditorState.css}
-		{@html `<style id="portal-user-css">${$cssEditorState.css}</style>`}
-	{/if}
 </svelte:head>
 
 <!-- Scroll progress bar -->
@@ -451,5 +448,4 @@
 {#if $cssEditorState.open}
 	<CssEditorWindow />
 {/if}
-
 
