@@ -50,7 +50,7 @@
 				<div>
 					<p class="font-bold"><a href="https://ipsj.ixsq.nii.ac.jp/records/2005731" target="_blank" rel="noopener noreferrer">スマートフォン単体によるARMesh制約付きUWB測位システムの設計と初期評価</a></p>
 					<p class="mt-1 text-sm">{t.nov2025Venue}</p>
-					<p class="mt-1 inline-flex items-center gap-1 text-sm font-bold" style="color: #939094;">
+					<p class="mt-1 inline-flex items-center gap-1 text-sm font-bold text-muted-foreground">
 						<Award size={14} />{t.award}
 					</p>
 				</div>

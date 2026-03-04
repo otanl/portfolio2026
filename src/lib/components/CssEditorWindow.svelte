@@ -1,6 +1,7 @@
 <script lang="ts">
-	import { onDestroy, onMount } from 'svelte';
-	import { cssEditorState } from '$lib/stores/portal';
+	import { onMount } from 'svelte';
+	import { cssEditorState, styleSwapped } from '$lib/stores/portal';
+	import { lighten, darken, contrastText } from '$lib/utils';
 	import { X } from 'lucide-svelte';
 
 	// Inject CSS via DOM so it appears after all stylesheets (beats @layer)
@@ -58,28 +59,7 @@
 	let hueRotate = $state(0);
 	let hueRotateEnabled = $state(false);
 
-	// Derive shadow colors from a base hex color
-	function hexToRgb(hex: string): [number, number, number] {
-		const n = parseInt(hex.replace('#', ''), 16);
-		return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
-	}
-	function rgbToHex(r: number, g: number, b: number): string {
-		return '#' + [r, g, b].map(c => Math.max(0, Math.min(255, Math.round(c))).toString(16).padStart(2, '0')).join('');
-	}
-	function lighten(hex: string, amount: number): string {
-		const [r, g, b] = hexToRgb(hex);
-		return rgbToHex(r + (255 - r) * amount, g + (255 - g) * amount, b + (255 - b) * amount);
-	}
-	function darken(hex: string, amount: number): string {
-		const [r, g, b] = hexToRgb(hex);
-		return rgbToHex(r * (1 - amount), g * (1 - amount), b * (1 - amount));
-	}
-	/** Returns black or white depending on background luminance */
-	function contrastText(hex: string): string {
-		const [r, g, b] = hexToRgb(hex);
-		const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-		return lum > 0.5 ? '#000000' : '#ffffff';
-	}
+	const DEFAULT_BG = '#dcd9de';
 
 	function buildCss(): string {
 		const S = '.portal-viewport';
@@ -121,7 +101,9 @@
 		}
 
 		if (textColor) {
-			allRules.push(`${S}, ${S} * {\n  color: ${textColor} !important;\n}`);
+			// Exclude elements with Tailwind text-*-foreground classes (e.g. badges)
+			// so that --secondary-foreground / --primary-foreground CSS vars take effect
+			allRules.push(`${S}, ${S} *:not([class*="text-secondary-foreground"]):not([class*="text-primary-foreground"]) {\n  color: ${textColor} !important;\n}`);
 		}
 
 		// Card bg
@@ -129,42 +111,51 @@
 			allRules.push(`${S} .retro-card,\n${S} [class*="card"] {\n  background-color: ${cardBgColor} !important;\n}`);
 		}
 
-		// Neumorphic shadows — always emit when any visual property changed
-		// Shadow color is derived from the surface the element sits on:
-		//   cards/buttons sit on the background → use bgColor
-		//   if no bgColor set, fall back to defaults
+		// Shadows — style depends on whether portal is in retro or neumorphic mode
+		const isRetro = $styleSwapped;
 		const hasAnyChange = bgColor || cardBgColor || textColor || accentColor || linkColor || borderColor || fontFamily || fontSizeEnabled || shadowSizeEnabled;
 		if (hasAnyChange) {
-			const surfaceColor = bgColor || '#e2dfe5';
-			const cardColor = cardBgColor || bgColor || '#e2dfe5';
+			const surfaceColor = bgColor || DEFAULT_BG;
+			const cardColor = cardBgColor || bgColor || DEFAULT_BG;
 			const ss = shadowSizeEnabled ? shadowSize : 6;
-			const ssHalf = Math.max(1, Math.round(ss / 2));
-			const ssBlur = ss * 2;
-			const ssBlurHalf = Math.max(1, Math.round(ssBlur / 2));
-			const sBtn = Math.round(ss * 0.67);
-			const sBtnBlur = Math.round(ssBlur * 0.67);
 
-			// Shadows for elements on the background surface
-			const bgDark = darken(surfaceColor, 0.18);
-			const bgLight = lighten(surfaceColor, 0.45);
-			const neuShadow = `${ss}px ${ss}px ${ssBlur}px ${bgDark}, -${ss}px -${ss}px ${ssBlur}px ${bgLight}`;
-			const neuShadowSm = `${ssHalf}px ${ssHalf}px ${ssBlurHalf}px ${bgDark}, -${ssHalf}px -${ssHalf}px ${ssBlurHalf}px ${bgLight}`;
-			const neuShadowBtn = `${sBtn}px ${sBtn}px ${sBtnBlur}px ${bgDark}, -${sBtn}px -${sBtn}px ${sBtnBlur}px ${bgLight}, inset 0 1px 1px rgba(255,255,255,0.3), inset 0 -1px 1px rgba(0,0,0,0.05)`;
+			if (isRetro) {
+				// Retro: flat drop shadow + outset border style
+				const shadow = `${ss}px ${ss}px 0 rgba(0,0,0,0.25)`;
+				const shadowSm = `${Math.max(1, Math.round(ss / 2))}px ${Math.max(1, Math.round(ss / 2))}px 0 rgba(0,0,0,0.2)`;
+				const bdr = borderColor || darken(surfaceColor, 0.3);
 
-			// Inset shadow for pressed state — derived from card surface
-			const cardDark = darken(cardColor, 0.18);
-			const cardLight = lighten(cardColor, 0.45);
-			const neuShadowInset = `inset ${ssHalf}px ${ssHalf}px ${ssBlurHalf}px ${cardDark}, inset -${ssHalf}px -${ssHalf}px ${ssBlurHalf}px ${cardLight}`;
+				allRules.push(`${S} .retro-card {\n  border: 2px outset ${bdr} !important;\n  box-shadow: ${shadow} !important;\n  background: ${cardColor} !important;\n}`);
+				allRules.push(`${S} .project-card:active {\n  box-shadow: inset 2px 2px 0 rgba(0,0,0,0.2) !important;\n  border-style: inset !important;\n}`);
+				allRules.push(`${S} .button-3d {\n  background: ${cardColor} !important;\n  color: ${textColor || 'inherit'} !important;\n  border: 2px outset ${bdr} !important;\n  box-shadow: ${shadowSm} !important;\n}`);
+				allRules.push(`${S} .retro-image {\n  box-shadow: ${shadowSm} !important;\n}`);
+				allRules.push(`${S} .under-construction {\n  background: ${surfaceColor} !important;\n  border: 2px outset ${bdr} !important;\n  box-shadow: ${shadow} !important;\n  color: ${textColor || '#666'} !important;\n}`);
+			} else {
+				// Neumorphic: soft dual-light shadows
+				const ssHalf = Math.max(1, Math.round(ss / 2));
+				const ssBlur = ss * 2;
+				const ssBlurHalf = Math.max(1, Math.round(ssBlur / 2));
+				const sBtn = Math.round(ss * 0.67);
+				const sBtnBlur = Math.round(ssBlur * 0.67);
 
-			// Let shadows overflow .site-main; .win-content clips at window edge
-			allRules.push(`${S} .site-main {\n  overflow: visible !important;\n}`);
+				const bgDark = darken(surfaceColor, 0.18);
+				const bgLight = lighten(surfaceColor, 0.45);
+				const neuShadow = `${ss}px ${ss}px ${ssBlur}px ${bgDark}, -${ss}px -${ss}px ${ssBlur}px ${bgLight}`;
+				const neuShadowSm = `${ssHalf}px ${ssHalf}px ${ssBlurHalf}px ${bgDark}, -${ssHalf}px -${ssHalf}px ${ssBlurHalf}px ${bgLight}`;
+				const neuShadowBtn = `${sBtn}px ${sBtn}px ${sBtnBlur}px ${bgDark}, -${sBtn}px -${sBtn}px ${sBtnBlur}px ${bgLight}, inset 0 1px 1px rgba(255,255,255,0.3), inset 0 -1px 1px rgba(0,0,0,0.05)`;
 
-			allRules.push(`${S} .retro-card {\n  border-color: transparent !important;\n  box-shadow: ${neuShadow} !important;\n}`);
-			allRules.push(`${S} .project-card:active {\n  box-shadow: ${neuShadowInset} !important;\n}`);
-			allRules.push(`${S} .button-3d {\n  background: ${cardColor} !important;\n  color: ${textColor || 'inherit'} !important;\n  border-color: transparent !important;\n  box-shadow: ${neuShadowBtn} !important;\n}`);
-			allRules.push(`${S} .retro-image {\n  box-shadow: ${neuShadowSm} !important;\n}`);
-			allRules.push(`${S} .retro-text {\n  text-shadow: none !important;\n}`);
-			allRules.push(`${S} .under-construction {\n  background: ${surfaceColor} !important;\n  border-color: transparent !important;\n  box-shadow: ${neuShadow} !important;\n  color: ${textColor || '#666'} !important;\n  text-shadow: none !important;\n}`);
+				const cardDark = darken(cardColor, 0.18);
+				const cardLight = lighten(cardColor, 0.45);
+				const neuShadowInset = `inset ${ssHalf}px ${ssHalf}px ${ssBlurHalf}px ${cardDark}, inset -${ssHalf}px -${ssHalf}px ${ssBlurHalf}px ${cardLight}`;
+
+				allRules.push(`${S} .site-main {\n  overflow: visible !important;\n}`);
+				allRules.push(`${S} .retro-card {\n  border-color: transparent !important;\n  box-shadow: ${neuShadow} !important;\n}`);
+				allRules.push(`${S} .project-card:active {\n  box-shadow: ${neuShadowInset} !important;\n}`);
+				allRules.push(`${S} .button-3d {\n  background: ${cardColor} !important;\n  color: ${textColor || 'inherit'} !important;\n  border-color: transparent !important;\n  box-shadow: ${neuShadowBtn} !important;\n}`);
+				allRules.push(`${S} .retro-image {\n  box-shadow: ${neuShadowSm} !important;\n}`);
+				allRules.push(`${S} .retro-text {\n  text-shadow: none !important;\n}`);
+				allRules.push(`${S} .under-construction {\n  background: ${surfaceColor} !important;\n  border-color: transparent !important;\n  box-shadow: ${neuShadow} !important;\n  color: ${textColor || '#666'} !important;\n  text-shadow: none !important;\n}`);
+			}
 		}
 
 		// Card gap — override Tailwind gap via custom property + margin fallback
@@ -181,8 +172,12 @@
 		{
 			const inputBg = cardBgColor || bgColor;
 			if (inputBg) {
-				const inputShadow = `inset 2px 2px 4px ${darken(inputBg, 0.15)}, inset -2px -2px 4px ${lighten(inputBg, 0.4)}`;
-				allRules.push(`${S} input,\n${S} textarea,\n${S} select {\n  background: ${inputBg} !important;\n  color: ${textColor || 'inherit'} !important;\n  border-color: transparent !important;\n  box-shadow: ${inputShadow} !important;\n}`);
+				if (isRetro) {
+					allRules.push(`${S} input,\n${S} textarea,\n${S} select {\n  background: ${inputBg} !important;\n  color: ${textColor || 'inherit'} !important;\n  border: 2px inset ${darken(inputBg, 0.2)} !important;\n}`);
+				} else {
+					const inputShadow = `inset 2px 2px 4px ${darken(inputBg, 0.15)}, inset -2px -2px 4px ${lighten(inputBg, 0.4)}`;
+					allRules.push(`${S} input,\n${S} textarea,\n${S} select {\n  background: ${inputBg} !important;\n  color: ${textColor || 'inherit'} !important;\n  border-color: transparent !important;\n  box-shadow: ${inputShadow} !important;\n}`);
+				}
 			}
 		}
 
@@ -196,9 +191,6 @@
 
 		if (accentColor) {
 			allRules.push(`${S} a.star-marker {\n  color: ${accentColor} !important;\n}`);
-			// Badge text: override the * text color rule with higher specificity
-			const badgeText = contrastText(accentColor);
-			allRules.push(`${S}${S} [class*="bg-secondary"] {\n  color: ${badgeText} !important;\n}`);
 		}
 
 		// Filters
@@ -218,6 +210,16 @@
 		rawCss = generated;
 		cssEditorState.update((s) => ({ ...s, css: generated }));
 	}
+
+	// Re-apply CSS when style swap changes (retro ↔ neumorphic)
+	let prevSwapped: boolean | undefined;
+	$effect(() => {
+		const swapped = $styleSwapped;
+		if (prevSwapped !== undefined && prevSwapped !== swapped) {
+			applyVisual();
+		}
+		prevSwapped = swapped;
+	});
 
 	function applyRaw() {
 		cssEditorState.update((s) => ({ ...s, css: rawCss }));
@@ -340,6 +342,18 @@
 		<button type="button" class="ed-btn-reset" onclick={reset}>Reset</button>
 	</div>
 
+	{#snippet colorRow(label: string, value: string, fallback: string, onset: (v: string) => void)}
+		<label class="ed-row">
+			<span class="ed-label">{label}</span>
+			<input type="color" class="ed-color" value={value || fallback}
+				oninput={(e) => { onset(e.currentTarget.value); applyVisual(); }} />
+			{#if value}
+				<button type="button" class="ed-clear"
+					onclick={() => { onset(''); applyVisual(); }}>x</button>
+			{/if}
+		</label>
+	{/snippet}
+
 	{#if tab === 'visual'}
 		<div class="ed-panel">
 			<!-- Theme presets -->
@@ -360,36 +374,12 @@
 			<!-- Colors -->
 			<fieldset class="ed-group">
 				<legend>Colors</legend>
-				<label class="ed-row">
-					<span class="ed-label">Background</span>
-					<input type="color" class="ed-color" value={bgColor || '#e2dfe5'} oninput={(e) => { bgColor = e.currentTarget.value; applyVisual(); }} />
-					{#if bgColor}<button type="button" class="ed-clear" onclick={() => { bgColor = ''; applyVisual(); }}>x</button>{/if}
-				</label>
-				<label class="ed-row">
-					<span class="ed-label">Card</span>
-					<input type="color" class="ed-color" value={cardBgColor || '#fffbfe'} oninput={(e) => { cardBgColor = e.currentTarget.value; applyVisual(); }} />
-					{#if cardBgColor}<button type="button" class="ed-clear" onclick={() => { cardBgColor = ''; applyVisual(); }}>x</button>{/if}
-				</label>
-				<label class="ed-row">
-					<span class="ed-label">Text</span>
-					<input type="color" class="ed-color" value={textColor || '#1c1b1f'} oninput={(e) => { textColor = e.currentTarget.value; applyVisual(); }} />
-					{#if textColor}<button type="button" class="ed-clear" onclick={() => { textColor = ''; applyVisual(); }}>x</button>{/if}
-				</label>
-				<label class="ed-row">
-					<span class="ed-label">Accent</span>
-					<input type="color" class="ed-color" value={accentColor || '#e7e0ec'} oninput={(e) => { accentColor = e.currentTarget.value; applyVisual(); }} />
-					{#if accentColor}<button type="button" class="ed-clear" onclick={() => { accentColor = ''; applyVisual(); }}>x</button>{/if}
-				</label>
-				<label class="ed-row">
-					<span class="ed-label">Links</span>
-					<input type="color" class="ed-color" value={linkColor || '#0000ff'} oninput={(e) => { linkColor = e.currentTarget.value; applyVisual(); }} />
-					{#if linkColor}<button type="button" class="ed-clear" onclick={() => { linkColor = ''; applyVisual(); }}>x</button>{/if}
-				</label>
-				<label class="ed-row">
-					<span class="ed-label">Border</span>
-					<input type="color" class="ed-color" value={borderColor || '#c9c5ca'} oninput={(e) => { borderColor = e.currentTarget.value; applyVisual(); }} />
-					{#if borderColor}<button type="button" class="ed-clear" onclick={() => { borderColor = ''; applyVisual(); }}>x</button>{/if}
-				</label>
+				{@render colorRow('Background', bgColor, '#fcf8fd', (v) => bgColor = v)}
+				{@render colorRow('Card', cardBgColor, '#f6f2f7', (v) => cardBgColor = v)}
+				{@render colorRow('Text', textColor, '#1c1b1f', (v) => textColor = v)}
+				{@render colorRow('Accent', accentColor, '#e2e0f9', (v) => accentColor = v)}
+				{@render colorRow('Links', linkColor, '#5455a9', (v) => linkColor = v)}
+				{@render colorRow('Border', borderColor, '#c8c5d0', (v) => borderColor = v)}
 			</fieldset>
 
 			<!-- Typography -->
@@ -671,12 +661,6 @@
 		outline: none;
 		user-select: text;
 		tab-size: 2;
-	}
-	.ed-hint {
-		font-size: 9px;
-		color: #888;
-		padding: 0 0 2px;
-		text-align: right;
 	}
 	.ed-textarea::placeholder { color: #999; }
 	.ed-status {

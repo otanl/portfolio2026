@@ -6,10 +6,14 @@ import type { Action } from 'svelte/action';
  */
 export const cursorGhost: Action<HTMLElement> = (node) => {
 	// Skip in modern mode, reduced-motion, portal, or touch devices
-	if (typeof window === 'undefined') return {};
-	if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return {};
-	if (document.documentElement.classList.contains('modern')) return {};
-	if (node.closest('.portal-viewport')) return {};
+	if (
+		typeof window === 'undefined' ||
+		window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
+		document.documentElement.classList.contains('modern') ||
+		node.closest('.portal-viewport')
+	) {
+		return {};
+	}
 
 	const SPEED_THRESHOLD = 1200; // px/s — only real fast flicks
 	const DROP_INTERVAL = 8; // px — drop a ghost every 8px along the path
@@ -22,12 +26,12 @@ export const cursorGhost: Action<HTMLElement> = (node) => {
 	let lastTime = 0;
 	let trailing = false; // currently in a fast-move streak
 	let ghostCount = 0;
+	let insideWinContent = false; // avoid closest() on every mousemove
 
 	// Detect which cursor to ghost (arrow vs pointer)
 	function getCursorType(target: EventTarget | null): 'default' | 'pointer' {
 		if (!target || !(target instanceof HTMLElement)) return 'default';
-		const el = target.closest('a, button, [role="button"], .button-3d');
-		return el ? 'pointer' : 'default';
+		return target.closest('a, button, [role="button"], .button-3d') ? 'pointer' : 'default';
 	}
 
 	function createGhost(x: number, y: number, type: 'default' | 'pointer') {
@@ -36,7 +40,6 @@ export const cursorGhost: Action<HTMLElement> = (node) => {
 		const ghost = document.createElement('div');
 		ghost.className = 'cursor-ghost';
 		ghost.setAttribute('data-cursor-type', type);
-
 		ghost.style.left = `${x}px`;
 		ghost.style.top = `${y}px`;
 
@@ -53,7 +56,7 @@ export const cursorGhost: Action<HTMLElement> = (node) => {
 	}
 
 	function onMouseMove(e: MouseEvent) {
-		if ((e.target as HTMLElement)?.closest?.('.win-content')) return;
+		if (insideWinContent) return;
 
 		const now = performance.now();
 		const dt = now - lastTime;
@@ -74,13 +77,10 @@ export const cursorGhost: Action<HTMLElement> = (node) => {
 				const cursorType = getCursorType(e.target);
 				const scrollX = window.scrollX;
 				const scrollY = window.scrollY;
-				// Interpolate ghosts along the path at DROP_INTERVAL spacing
 				const steps = Math.floor(dist / DROP_INTERVAL);
 				for (let s = 1; s <= steps; s++) {
 					const t = s / steps;
-					const ix = lastX + dx * t + scrollX;
-					const iy = lastY + dy * t + scrollY;
-					createGhost(ix, iy, cursorType);
+					createGhost(lastX + dx * t + scrollX, lastY + dy * t + scrollY, cursorType);
 				}
 			}
 		}
@@ -90,12 +90,27 @@ export const cursorGhost: Action<HTMLElement> = (node) => {
 		lastTime = now;
 	}
 
+	// Track .win-content enter/leave instead of calling closest() per mousemove
+	function onMouseOver(e: MouseEvent) {
+		if ((e.target as HTMLElement)?.closest?.('.win-content')) {
+			insideWinContent = true;
+		}
+	}
+	function onMouseOut(e: MouseEvent) {
+		if (insideWinContent && (e.target as HTMLElement)?.closest?.('.win-content')) {
+			insideWinContent = false;
+		}
+	}
+
 	window.addEventListener('mousemove', onMouseMove, { passive: true });
+	document.addEventListener('mouseover', onMouseOver, { passive: true });
+	document.addEventListener('mouseout', onMouseOut, { passive: true });
 
 	return {
 		destroy() {
 			window.removeEventListener('mousemove', onMouseMove);
-			// Clean up any remaining ghosts
+			document.removeEventListener('mouseover', onMouseOver);
+			document.removeEventListener('mouseout', onMouseOut);
 			document.querySelectorAll('.cursor-ghost').forEach((el) => el.remove());
 		}
 	};

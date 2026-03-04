@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import type { Snippet } from 'svelte';
-	import { cssEditorState } from '$lib/stores/portal';
+	import { cssEditorState, styleSwapped } from '$lib/stores/portal';
 
 	interface Props {
 		title?: string;
@@ -37,10 +37,7 @@
 	let minimized = $state(false);
 	let glassEffect = $state(false);
 	let glitchEffect = $state(false);
-	let maximized = $state(false);
 	let minTop = 48;
-	let preMaxRect = { x: 0, y: 0, w: 0, h: 0 };
-	let preMaxScrollY = 0;
 	let viewportDocX = $state(0);
 	let viewportDocY = $state(0);
 	let metricsRaf = 0;
@@ -185,7 +182,7 @@
 
 	// RAF loop: glitch intensity driven by mouse velocity
 	$effect(() => {
-		if (!glitchEffect || maximized) return;
+		if (!glitchEffect) return;
 
 		let animId: number;
 		let smoothScale = 5;
@@ -219,7 +216,7 @@
 
 	// RAF loop: glass breathing + position-dependent distortion
 	$effect(() => {
-		if (!glassEffect || maximized) return;
+		if (!glassEffect) return;
 
 		let animId: number;
 		let phase = 0;
@@ -261,46 +258,13 @@
 	});
 
 	function handleMaximize() {
-		if (maximized) {
-			x = preMaxRect.x;
-			y = preMaxRect.y;
-			w = preMaxRect.w;
-			h = preMaxRect.h;
-			maximized = false;
-			if (contentEl) contentEl.scrollTop = 0;
-			// Restore background page scroll
-			window.scrollTo(0, preMaxScrollY);
-		} else {
-			preMaxRect = { x, y, w, h };
-			preMaxScrollY = window.scrollY;
-			syncHeaderOffset();
-			const pad = variant === 'win95' ? 8 : 4;
-			x = pad;
-			y = minTop + pad;
-			w = window.innerWidth - pad * 2;
-			h = window.innerHeight - minTop - pad * 2;
-			maximized = true;
-			// Sync portal scroll to background page position
-			requestAnimationFrame(() => {
-				window.scrollTo(0, preMaxScrollY);
-			});
-		}
+		styleSwapped.update(v => !v);
 	}
 
 	function syncHeaderOffset() {
 		const header = document.querySelector('.liquid-glass-header') as HTMLElement | null;
 		const headerBottom = header ? Math.ceil(header.getBoundingClientRect().bottom) : 0;
 		minTop = Math.max(48, headerBottom + 4);
-	}
-
-	function syncMaximizedBounds() {
-		if (!maximized) return;
-		syncHeaderOffset();
-		const pad = variant === 'win95' ? 8 : 4;
-		x = pad;
-		y = minTop + pad;
-		w = window.innerWidth - pad * 2;
-		h = Math.max(MIN_H, window.innerHeight - minTop - pad * 2);
 	}
 
 	function syncViewportMetrics() {
@@ -319,7 +283,6 @@
 		});
 	}
 
-	// Sync: portal scroll ↔ background page scroll while maximized
 	// Help gimmick (BSOD / error cascade)
 	let bsod = $state(false);
 	let errorDialogs = $state<{ id: number; x: number; y: number; msg: string }[]>([]);
@@ -361,7 +324,6 @@
 	}
 
 	function handleView() {
-		if (maximized) { showCrash(); return; }
 		glitchEffect = !glitchEffect;
 	}
 
@@ -431,8 +393,7 @@
 		const onScroll = () => { scheduleMetricsSync(); };
 		const onResize = () => {
 			syncHeaderOffset();
-			if (!maximized) y = Math.max(y, minTop);
-			syncMaximizedBounds();
+			y = Math.max(y, minTop);
 			scheduleMetricsSync();
 		};
 
@@ -514,7 +475,7 @@
 				<span class="win-titlebar-text">{title}</span>
 				<div class="win-titlebar-buttons">
 					<button class="win-btn" onclick={() => minimized = true}>&#x2500;</button>
-					<button class="win-btn" onclick={handleMaximize}>&#9633;</button>
+					<button class="win-btn" onclick={handleMaximize}>{$styleSwapped ? '■' : '□'}</button>
 					<button class="win-btn win-btn-close" onclick={() => { visible = false; onclose?.(); }}>&times;</button>
 				</div>
 			</div>
@@ -534,16 +495,16 @@
 			<input type="file" accept="image/*" multiple bind:this={fileInput} onchange={handleFileSelected} style="display:none" />
 
 			<!-- svelte-ignore a11y_no_static_element_interactions -->
-			<div class="win-content" class:win-content-maximized={maximized} bind:this={contentEl} onmousemove={handleContentMouseMove} onwheel={handleContentWheel}>
+			<div class="win-content" bind:this={contentEl} onmousemove={handleContentMouseMove} onwheel={handleContentWheel}>
 				{#if children}
 					<div
-						class="portal-viewport portal-modern"
-						class:portal-maximized={maximized}
-						class:glitch-active={!maximized && glitchEffect}
+						class="portal-viewport"
+						class:portal-modern={!$styleSwapped}
+						class:glitch-active={glitchEffect}
 						style:left={`${-viewportDocX}px`}
 						style:top={`${-viewportDocY}px`}
 						style:width={'100vw'}
-						style:filter={!maximized && activeFilter ? activeFilter : undefined}
+						style:filter={activeFilter || undefined}
 					>
 						{@render children()}
 					</div>
@@ -638,9 +599,7 @@
 	.win-titlebar-buttons { display: flex; }
 	.win-btn { display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 0; }
 	.win-content { flex: 1; overflow: hidden; position: relative; }
-	.win-content-maximized { overflow: hidden; }
 	.portal-viewport { position: absolute; pointer-events: auto; font-size: 16px; }
-	.portal-maximized { width: 100vw; }
 	.resize-handle { position: absolute; z-index: 10; }
 	.resize-n  { top: -3px; left: 8px; right: 8px; height: 6px; cursor: n-resize; }
 	.resize-s  { bottom: -3px; left: 8px; right: 8px; height: 6px; cursor: s-resize; }
@@ -653,10 +612,10 @@
 
 	/* ===== Windows 95 (neumorphism palette) ===== */
 	.win-window.win95 {
-		background: #d6d3d9;
+		background: #d4d7df;
 		border: 2px solid;
-		border-color: #f0edf3 #3a383e #3a383e #f0edf3;
-		box-shadow: 1px 0 0 #1c1b1f, 0 1px 0 #1c1b1f, 1px 1px 0 #1c1b1f, inset 1px 1px 0 #f0edf3;
+		border-color: #eef0f6 #3a383e #3a383e #eef0f6;
+		box-shadow: 1px 0 0 #1c1b1f, 0 1px 0 #1c1b1f, 1px 1px 0 #1c1b1f, inset 1px 1px 0 #eef0f6;
 		font-family: 'MS Sans Serif', 'MS UI Gothic', Tahoma, sans-serif;
 		font-size: 12px;
 	}
@@ -669,14 +628,14 @@
 	.win95 .win-titlebar {
 		gap: 3px;
 		padding: 2px 2px 2px 3px;
-		background: linear-gradient(90deg, #8b3a16, #e85d2a);
-		color: #f0edf3;
+		background: linear-gradient(90deg, #000080, #1084d0);
+		color: #ffffff;
 		font-weight: bold;
 		font-size: 11px;
 		letter-spacing: 0.3px;
 	}
 	:global(.dark) .win95 .win-titlebar {
-		background: linear-gradient(90deg, #5c2610, #a3411d);
+		background: linear-gradient(90deg, #000050, #0a5a90);
 	}
 
 	.win95 .win-titlebar-icon {
@@ -696,19 +655,19 @@
 	.win95 .win-btn {
 		width: 16px; height: 14px;
 		font-size: 11px; line-height: 1;
-		background: #d6d3d9;
+		background: #d4d7df;
 		border: 1px solid;
-		border-color: #f0edf3 #3a383e #3a383e #f0edf3;
+		border-color: #eef0f6 #3a383e #3a383e #eef0f6;
 		color: #1c1b1f;
 	}
-	.win95 .win-btn:active { border-color: #3a383e #f0edf3 #f0edf3 #3a383e; }
+	.win95 .win-btn:active { border-color: #3a383e #eef0f6 #eef0f6 #3a383e; }
 	.win95 .win-btn-close { font-size: 13px; font-weight: bold; }
 
 	.win95 .win-menubar {
 		display: flex;
 		padding: 0 1px;
-		background: #d6d3d9;
-		border-bottom: 1px solid #c4c1c7;
+		background: #d4d7df;
+		border-bottom: 1px solid #c0c4ce;
 	}
 	:global(.dark) .win95 .win-menubar {
 		background: #38363c;
@@ -720,12 +679,12 @@
 		color: #1c1b1f;
 	}
 	:global(.dark) .win95 .win-menu-item { color: #e6e1e5; }
-	.win95 .win-menu-item:hover { background: #2d2b31; color: #f0edf3; }
+	.win95 .win-menu-item:hover { background: #2d2b31; color: #eef0f6; }
 
 	.win95 .win-content {
 		margin: 2px;
 		border: 2px solid;
-		border-color: #c4c1c7 #f0edf3 #f0edf3 #c4c1c7;
+		border-color: #c0c4ce #eef0f6 #eef0f6 #c0c4ce;
 	}
 	:global(.dark) .win95 .win-content {
 		border-color: #1e1c22 #4a484e #4a484e #1e1c22;
@@ -736,16 +695,16 @@
 		position: fixed; bottom: 4px; left: 4px; z-index: 40;
 		display: flex; align-items: center; gap: 4px;
 		padding: 2px 10px 2px 4px;
-		background: #d6d3d9;
+		background: #d4d7df;
 		border: 2px solid;
-		border-color: #f0edf3 #3a383e #3a383e #f0edf3;
+		border-color: #eef0f6 #3a383e #3a383e #eef0f6;
 		font-family: 'MS Sans Serif', 'MS UI Gothic', Tahoma, sans-serif;
 		font-size: 11px;
 		cursor: pointer; color: #1c1b1f;
-		box-shadow: inset 1px 1px 0 #f0edf3;
+		box-shadow: inset 1px 1px 0 #eef0f6;
 	}
 	:global(.dark) .win-taskbar-btn.win95 { background: #38363c; border-color: #4a484e #1e1c22 #1e1c22 #4a484e; color: #e6e1e5; }
-	.win-taskbar-btn.win95:active { border-color: #3a383e #f0edf3 #f0edf3 #3a383e; box-shadow: inset 1px 1px 0 #c4c1c7; }
+	.win-taskbar-btn.win95:active { border-color: #3a383e #eef0f6 #eef0f6 #3a383e; box-shadow: inset 1px 1px 0 #c0c4ce; }
 
 	.win95 .win-taskbar-icon,
 	.win-taskbar-btn.win95 .win-taskbar-icon {
@@ -761,42 +720,42 @@
 
 	/* ===== Windows Vista Aero Glass (site palette) ===== */
 	.win-window.vista {
-		background: rgba(214, 211, 217, 0.45);
-		backdrop-filter: blur(16px);
-		-webkit-backdrop-filter: blur(16px);
-		border: 1px solid rgba(196, 193, 199, 0.5);
+		background: rgba(200, 210, 230, 0.3);
+		backdrop-filter: blur(18px);
+		-webkit-backdrop-filter: blur(18px);
+		border: 1px solid rgba(255, 255, 255, 0.4);
 		border-radius: 8px 8px 4px 4px;
 		box-shadow:
-			0 8px 32px rgba(0, 0, 0, 0.28),
-			0 0 1px rgba(0, 0, 0, 0.4),
-			inset 0 1px 0 rgba(255, 255, 255, 0.35);
+			0 8px 32px rgba(0, 0, 0, 0.22),
+			0 0 1px rgba(0, 0, 0, 0.3),
+			inset 0 1px 0 rgba(255, 255, 255, 0.5);
 		font-family: 'Segoe UI', 'Yu Gothic UI', Tahoma, sans-serif;
 		font-size: 12px;
 		overflow: hidden;
 	}
 	:global(.dark) .win-window.vista {
-		background: rgba(45, 43, 49, 0.6);
-		border-color: rgba(72, 70, 73, 0.4);
+		background: rgba(20, 25, 50, 0.35);
+		border-color: rgba(100, 120, 180, 0.25);
 		box-shadow:
 			0 8px 32px rgba(0, 0, 0, 0.5),
 			0 0 1px rgba(0, 0, 0, 0.6),
-			inset 0 1px 0 rgba(255, 255, 255, 0.1);
+			inset 0 1px 0 rgba(255, 255, 255, 0.08);
 	}
 
 	.vista .win-titlebar {
 		gap: 6px;
 		height: 30px;
 		padding: 0 4px 0 8px;
-		background: linear-gradient(180deg, rgba(240,128,80,0.6) 0%, rgba(232,93,42,0.5) 50%, rgba(220,85,35,0.55) 100%);
-		border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+		background: linear-gradient(180deg, rgba(180,200,240,0.35) 0%, rgba(150,175,220,0.25) 50%, rgba(130,160,210,0.3) 100%);
+		border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 		color: #fff;
 		font-size: 12px;
 		font-weight: normal;
-		text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+		text-shadow: 0 0 6px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(0, 0, 0, 0.4);
 	}
 	:global(.dark) .vista .win-titlebar {
-		background: linear-gradient(180deg, rgba(200,70,25,0.55) 0%, rgba(180,60,20,0.45) 50%, rgba(170,55,18,0.5) 100%);
-		border-bottom-color: rgba(255, 255, 255, 0.08);
+		background: linear-gradient(180deg, rgba(40,60,120,0.4) 0%, rgba(30,50,100,0.3) 50%, rgba(20,40,90,0.35) 100%);
+		border-bottom-color: rgba(255, 255, 255, 0.06);
 	}
 
 	.vista .win-titlebar-icon {
@@ -832,23 +791,24 @@
 	.vista .win-menubar {
 		display: flex;
 		padding: 0 3px; margin: 0 3px;
-		background: rgba(232, 93, 42, 0.12);
-		border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+		background: rgba(240, 243, 250, 0.88);
+		border-bottom: 1px solid rgba(180, 190, 210, 0.4);
 	}
 	:global(.dark) .vista .win-menubar {
-		background: rgba(180, 60, 20, 0.1);
-		border-bottom-color: rgba(255, 255, 255, 0.06);
+		background: rgba(38, 38, 58, 0.85);
+		border-bottom-color: rgba(80, 80, 110, 0.3);
 	}
 	.vista .win-menu-item {
 		padding: 3px 8px;
 		cursor: default;
-		color: rgba(0, 0, 0, 0.7);
+		color: rgba(20, 20, 40, 0.85);
 		font-size: 11px;
 		border-radius: 2px;
 		transition: background 0.1s;
 	}
-	:global(.dark) .vista .win-menu-item { color: rgba(255, 255, 255, 0.7); }
-	.vista .win-menu-item:hover { background: rgba(232, 93, 42, 0.3); color: #fff; }
+	:global(.dark) .vista .win-menu-item { color: rgba(220, 225, 235, 0.8); }
+	.vista .win-menu-item:hover { background: rgba(60, 120, 215, 0.25); color: #000; }
+	:global(.dark) .vista .win-menu-item:hover { background: rgba(80, 140, 230, 0.3); color: #fff; }
 
 	.vista .win-content {
 		margin: 0 3px 3px 3px;
@@ -861,21 +821,21 @@
 		position: fixed; bottom: 6px; left: 6px; z-index: 40;
 		display: flex; align-items: center; gap: 6px;
 		padding: 4px 12px 4px 6px;
-		background: rgba(214, 211, 217, 0.5);
-		backdrop-filter: blur(12px);
-		-webkit-backdrop-filter: blur(12px);
-		border: 1px solid rgba(196, 193, 199, 0.4);
+		background: rgba(200, 210, 230, 0.35);
+		backdrop-filter: blur(14px);
+		-webkit-backdrop-filter: blur(14px);
+		border: 1px solid rgba(255, 255, 255, 0.35);
 		border-radius: 4px;
 		font-family: 'Segoe UI', 'Yu Gothic UI', Tahoma, sans-serif;
 		font-size: 11px;
 		cursor: pointer; color: #fff;
 		text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
-		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
 		transition: background 0.15s;
 	}
-	:global(.dark) .win-taskbar-btn.vista { background: rgba(45, 43, 49, 0.65); border-color: rgba(72, 70, 73, 0.4); color: #ddd; }
-	.win-taskbar-btn.vista:hover { background: rgba(240, 237, 243, 0.6); }
-	:global(.dark) .win-taskbar-btn.vista:hover { background: rgba(58, 56, 62, 0.7); }
+	:global(.dark) .win-taskbar-btn.vista { background: rgba(20, 25, 50, 0.4); border-color: rgba(100, 120, 180, 0.25); color: #ddd; }
+	.win-taskbar-btn.vista:hover { background: rgba(210, 220, 240, 0.5); }
+	:global(.dark) .win-taskbar-btn.vista:hover { background: rgba(40, 50, 80, 0.5); }
 
 	.vista .win-taskbar-icon,
 	.win-taskbar-btn.vista .win-taskbar-icon {
@@ -909,7 +869,7 @@
 		background: rgba(45, 43, 49, 0.2);
 	}
 	.vista .win-menu-active {
-		background: rgba(232, 93, 42, 0.25);
+		background: rgba(60, 120, 215, 0.2);
 	}
 	.win-menu-active::before {
 		content: '✓ ';
@@ -970,9 +930,9 @@
 	.error-dialog {
 		position: fixed;
 		width: 280px;
-		background: #d6d3d9;
+		background: #d4d7df;
 		border: 2px solid;
-		border-color: #f0edf3 #3a383e #3a383e #f0edf3;
+		border-color: #eef0f6 #3a383e #3a383e #eef0f6;
 		box-shadow: 2px 2px 0 #1c1b1f;
 		font-family: 'MS Sans Serif', 'MS UI Gothic', Tahoma, sans-serif;
 		font-size: 12px;
@@ -991,16 +951,16 @@
 	.error-dialog-titlebar {
 		display: flex; align-items: center; justify-content: space-between;
 		padding: 2px 2px 2px 4px;
-		background: linear-gradient(90deg, #8b3a16, #e85d2a);
-		color: #f0edf3; font-weight: bold; font-size: 11px;
+		background: linear-gradient(90deg, #000080, #1084d0);
+		color: #eef0f6; font-weight: bold; font-size: 11px;
 	}
 	:global(.dark) .error-dialog-titlebar {
-		background: linear-gradient(90deg, #5c2610, #a3411d);
+		background: linear-gradient(90deg, #000050, #0a5a90);
 	}
 	.error-dialog-close {
 		width: 16px; height: 14px; font-size: 13px; line-height: 1;
-		background: #d6d3d9; border: 1px solid;
-		border-color: #f0edf3 #3a383e #3a383e #f0edf3;
+		background: #d4d7df; border: 1px solid;
+		border-color: #eef0f6 #3a383e #3a383e #eef0f6;
 		color: #1c1b1f; cursor: pointer;
 		display: flex; align-items: center; justify-content: center; padding: 0;
 	}
@@ -1011,13 +971,13 @@
 	.error-dialog-body p { margin: 0; padding-top: 4px; line-height: 1.4; }
 	.error-dialog-buttons { text-align: center; padding: 4px 12px 10px; }
 	.error-dialog-ok {
-		padding: 2px 24px; background: #d6d3d9; border: 2px solid;
-		border-color: #f0edf3 #3a383e #3a383e #f0edf3;
+		padding: 2px 24px; background: #d4d7df; border: 2px solid;
+		border-color: #eef0f6 #3a383e #3a383e #eef0f6;
 		cursor: pointer; font-size: 12px; font-family: inherit;
 	}
 	:global(.dark) .error-dialog-ok {
 		background: #38363c; border-color: #4a484e #1e1c22 #1e1c22 #4a484e; color: #e6e1e5;
 	}
-	.error-dialog-ok:active { border-color: #3a383e #f0edf3 #f0edf3 #3a383e; }
+	.error-dialog-ok:active { border-color: #3a383e #eef0f6 #eef0f6 #3a383e; }
 
 </style>

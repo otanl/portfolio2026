@@ -95,7 +95,7 @@
 			>
 				<Card class={cn(
 					'retro-card project-card h-full overflow-hidden rounded-none transition-shadow duration-500',
-					isSelected && 'shadow-[6px_6px_0_#1c1b1f] dark:shadow-[6px_6px_0_#4a484e]'
+					isSelected && 'shadow-[6px_6px_0_#1c1b1f] dark:shadow-[6px_6px_0_#47464f]'
 				)}>
 					<!-- メディアエリア -->
 					<div class="relative overflow-hidden transition-[height] duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]" style="height: {isSelected ? 'auto' : '200px'};">

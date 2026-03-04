@@ -43,12 +43,12 @@
 	class="
 		inline-flex items-center justify-center
 		border-transparent
-		bg-[#e2dfe5] dark:bg-[#2d2b31]
+		bg-[#dcd9de] dark:bg-[#131316]
 		rounded-full h-auto w-auto py-2
-		shadow-[8px_8px_16px_#c4c1c7,_-8px_-8px_16px_#f0edf3]
-		dark:shadow-[8px_8px_16px_#1e1c22,_-8px_-8px_16px_#3a383e]
-		active:shadow-[inset_8px_8px_16px_#c4c1c7,inset_-8px_-8px_16px_#f0edf3]
-		dark:active:shadow-[inset_8px_8px_16px_#1e1c22,inset_-8px_-8px_16px_#3a383e]
+		shadow-[8px_8px_16px_#c8c5d0,_-8px_-8px_16px_#ebe7ec]
+		dark:shadow-[8px_8px_16px_#0e0e11,_-8px_-8px_16px_#201f23]
+		active:shadow-[inset_8px_8px_16px_#c8c5d0,inset_-8px_-8px_16px_#ebe7ec]
+		dark:active:shadow-[inset_8px_8px_16px_#0e0e11,inset_-8px_-8px_16px_#201f23]
 		transform active:scale-95 transition-all duration-150 ease-in-out
 	"
 >

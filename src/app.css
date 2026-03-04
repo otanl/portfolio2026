@@ -109,79 +109,79 @@
 }
 
 :root {
-	/* M3 Neutral Palette (slight warm tint) */
-	--background: #e2dfe5;
+	/* M3 Navy palette (seed #1a1a4e) — Light */
+	--background: #fcf8fd;
 	--foreground: #1c1b1f;
-	--card: #fffbfe;
+	--card: #f6f2f7;
 	--card-foreground: #1c1b1f;
-	--popover: #fffbfe;
+	--popover: #f0edf1;
 	--popover-foreground: #1c1b1f;
-	--primary: #1c1b1f;
-	--primary-foreground: #fffbfe;
-	--secondary: #e7e0ec;
-	--secondary-foreground: #1c1b1f;
-	--muted: #f5eff4;
-	--muted-foreground: #605d62;
-	--accent: #e7e0ec;
+	--primary: #5455a9;
+	--primary-foreground: #ffffff;
+	--secondary: #e2e0f9;
+	--secondary-foreground: #1a1a2c;
+	--muted: #e5e1e6;
+	--muted-foreground: #47464f;
+	--accent: #ebe7ec;
 	--accent-foreground: #1c1b1f;
-	--destructive: #b3261e;
+	--destructive: #ba1a1a;
 	--destructive-foreground: #ffffff;
-	--border: #c9c5ca;
-	--input: #c9c5ca;
-	--ring: #787579;
-	--chart-1: #f54900;
-	--chart-2: #009689;
-	--chart-3: #104e64;
-	--chart-4: #ffb900;
-	--chart-5: #fe9a00;
+	--border: #c8c5d0;
+	--input: #c8c5d0;
+	--ring: #5455a9;
+	--chart-1: #e2ff00;
+	--chart-2: #5455a9;
+	--chart-3: #795369;
+	--chart-4: #5d5c72;
+	--chart-5: #ba1a1a;
 	--radius: 0rem;
-	--sidebar: #f5eff4;
+	--sidebar: #f6f2f7;
 	--sidebar-foreground: #1c1b1f;
-	--sidebar-primary: #1c1b1f;
-	--sidebar-primary-foreground: #fffbfe;
-	--sidebar-accent: #e7e0ec;
+	--sidebar-primary: #5455a9;
+	--sidebar-primary-foreground: #ffffff;
+	--sidebar-accent: #ebe7ec;
 	--sidebar-accent-foreground: #1c1b1f;
-	--sidebar-border: #c9c5ca;
-	--sidebar-ring: #787579;
+	--sidebar-border: #c8c5d0;
+	--sidebar-ring: #5455a9;
 	--site-header-height: 68px;
 	--site-header-mobile-height: 58px;
 	--site-header-offset: 16px;
 }
 
 .dark {
-	/* M3 Dark Neutral Palette */
-	--background: #2d2b31;
-	--foreground: #e6e1e5;
-	--card: #211f26;
-	--card-foreground: #e6e1e5;
-	--popover: #211f26;
-	--popover-foreground: #e6e1e5;
-	--primary: #e6e1e5;
-	--primary-foreground: #1c1b1f;
-	--secondary: #332f35;
-	--secondary-foreground: #e6e1e5;
-	--muted: #332f35;
-	--muted-foreground: #939094;
-	--accent: #332f35;
-	--accent-foreground: #e6e1e5;
-	--destructive: #601410;
-	--destructive-foreground: #f2b8b5;
-	--border: #484649;
-	--input: #484649;
-	--ring: #605d62;
-	--chart-1: #1447e6;
-	--chart-2: #00bc7d;
-	--chart-3: #fe9a00;
-	--chart-4: #ad46ff;
-	--chart-5: #ff2056;
+	/* M3 Navy palette (seed #1a1a4e) — Dark */
+	--background: #131316;
+	--foreground: #e5e1e6;
+	--card: #1c1b1f;
+	--card-foreground: #e5e1e6;
+	--popover: #201f23;
+	--popover-foreground: #e5e1e6;
+	--primary: #c1c1ff;
+	--primary-foreground: #252478;
+	--secondary: #454559;
+	--secondary-foreground: #e2e0f9;
+	--muted: #353438;
+	--muted-foreground: #c8c5d0;
+	--accent: #2a292d;
+	--accent-foreground: #e5e1e6;
+	--destructive: #ffb4ab;
+	--destructive-foreground: #690005;
+	--border: #47464f;
+	--input: #47464f;
+	--ring: #c1c1ff;
+	--chart-1: #e2ff00;
+	--chart-2: #c1c1ff;
+	--chart-3: #e9b9d3;
+	--chart-4: #c6c4dd;
+	--chart-5: #ffb4ab;
 	--sidebar: #1c1b1f;
-	--sidebar-foreground: #e6e1e5;
-	--sidebar-primary: #cbbeff;
-	--sidebar-primary-foreground: #e6e1e5;
-	--sidebar-accent: #332f35;
-	--sidebar-accent-foreground: #e6e1e5;
-	--sidebar-border: #484649;
-	--sidebar-ring: #605d62;
+	--sidebar-foreground: #e5e1e6;
+	--sidebar-primary: #c1c1ff;
+	--sidebar-primary-foreground: #252478;
+	--sidebar-accent: #2a292d;
+	--sidebar-accent-foreground: #e5e1e6;
+	--sidebar-border: #47464f;
+	--sidebar-ring: #c1c1ff;
 }
 
 @layer base {
@@ -243,14 +243,9 @@
 
 @layer utilities {
 	.border-outset {
-		border: 3px outset #c4c1c7;
+		border: 3px outset #c8c5d0;
 		box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
-		background: #f0edf3;
-	}
-	.border-inset {
-		border-style: inset;
-		border-color: var(--border-3d-color);
-		border-width: 2px;
+		background: #f3eff4;
 	}
 	.text-blink {
 		animation: blink 1s step-end infinite;
@@ -290,40 +285,40 @@
 /* 90年代風のボタンスタイル */
 .button-3d {
 	border: 2px solid;
-	border-top-color: #f0edf3;
-	border-left-color: #f0edf3;
+	border-top-color: #f3eff4;
+	border-left-color: #f3eff4;
 	border-right-color: #1c1b1f;
 	border-bottom-color: #1c1b1f;
-	background: #d6d3d9;
+	background: #dcd9de;
 	padding: 4px 8px;
 	border-radius: 0;
 }
 
 .dark .button-3d {
 	border: 2px solid;
-	border-top-color: #4a484e;
-	border-left-color: #4a484e;
-	border-right-color: #1c1b1f;
-	border-bottom-color: #1c1b1f;
-	background: #38363c;
-	color: #e6e1e5;
+	border-top-color: #353438;
+	border-left-color: #353438;
+	border-right-color: #131316;
+	border-bottom-color: #131316;
+	background: #2a292d;
+	color: #e5e1e6;
 }
 
 .button-3d:active {
 	border: 2px solid;
 	border-top-color: #1c1b1f;
 	border-left-color: #1c1b1f;
-	border-right-color: #f0edf3;
-	border-bottom-color: #f0edf3;
-	background: #c4c1c7;
+	border-right-color: #f3eff4;
+	border-bottom-color: #f3eff4;
+	background: #c8c5d0;
 }
 
 .dark .button-3d:active {
-	border-top-color: #1c1b1f;
-	border-left-color: #1c1b1f;
-	border-right-color: #4a484e;
-	border-bottom-color: #4a484e;
-	background: #2d2b31;
+	border-top-color: #131316;
+	border-left-color: #131316;
+	border-right-color: #353438;
+	border-bottom-color: #353438;
+	background: #201f23;
 }
 
 /* 画像のグレースケール効果 */
@@ -333,17 +328,17 @@
 
 /* 90年代風のカード */
 .retro-card {
-	background: #f0edf3;
+	background: #f3eff4;
 	border: 2px solid #1c1b1f;
-	box-shadow: 3px 3px 0 #1c1b1f, inset 1px 1px 0 #f0edf3, inset -1px -1px 0 #c4c1c7;
+	box-shadow: 3px 3px 0 #1c1b1f, inset 1px 1px 0 #fcf8fd, inset -1px -1px 0 #c8c5d0;
 	border-radius: 0;
 }
 
 .dark .retro-card {
-	background: #38363c;
-	border: 2px solid #4a484e;
-	box-shadow: 3px 3px 0 #1c1b1f, inset 1px 1px 0 #4a484e, inset -1px -1px 0 #1e1c22;
-	color: #e6e1e5;
+	background: #201f23;
+	border: 2px solid #47464f;
+	box-shadow: 3px 3px 0 #131316, inset 1px 1px 0 #353438, inset -1px -1px 0 #131316;
+	color: #e5e1e6;
 }
 
 /* プロジェクトカード専用のアニメーション */
@@ -357,11 +352,11 @@
 
 .project-card:active {
 	transform: translateY(0);
-	box-shadow: 1px 1px 0 #1c1b1f, inset 1px 1px 0 #f0edf3, inset -1px -1px 0 #c4c1c7;
+	box-shadow: 1px 1px 0 #1c1b1f, inset 1px 1px 0 #fcf8fd, inset -1px -1px 0 #c8c5d0;
 }
 
 .dark .project-card:active {
-	box-shadow: 1px 1px 0 #1c1b1f, inset 1px 1px 0 #4a484e, inset -1px -1px 0 #1e1c22;
+	box-shadow: 1px 1px 0 #131316, inset 1px 1px 0 #353438, inset -1px -1px 0 #131316;
 }
 
 /* 星マーカー */
@@ -513,9 +508,6 @@
 }
 
 /* ===== Dark Mode ===== */
-.dark .liquid-glass-header {
-}
-
 .dark .liquid-glass-tint {
 	background: rgba(255, 255, 255, 0.08);
 }
@@ -532,9 +524,9 @@
 
 /* Neumorphism CSS variables */
 .modern {
-	--neu-bg: #e2dfe5;
-	--neu-light: #f0edf3;
-	--neu-dark: #c4c1c7;
+	--neu-bg: #dcd9de;
+	--neu-light: #ebe7ec;
+	--neu-dark: #c8c5d0;
 	--neu-shadow:
 		6px 6px 12px var(--neu-dark),
 		-6px -6px 12px var(--neu-light);
@@ -549,14 +541,21 @@
 		-4px -4px 8px var(--neu-light),
 		inset 0 1px 1px rgba(255,255,255,0.3),
 		inset 0 -1px 1px rgba(0,0,0,0.05);
-	--neu-accent: hsl(15, 85%, 58%);
+	--neu-accent: #5455a9;
+	/* Override surface tokens to match neu-bg */
+	--background: #dcd9de;
+	--card: #dcd9de;
+	--popover: #dcd9de;
+	--muted: #c8c5d0;
+	--accent: #c8c5d0;
+	--border: #c8c5d0;
 	--radius: 1rem;
 }
 
 .modern.dark {
-	--neu-bg: #2d2b31;
-	--neu-light: #3a383e;
-	--neu-dark: #1e1c22;
+	--neu-bg: #131316;
+	--neu-light: #201f23;
+	--neu-dark: #0e0e11;
 	--neu-shadow:
 		6px 6px 12px var(--neu-dark),
 		-6px -6px 12px var(--neu-light);
@@ -571,6 +570,12 @@
 		-4px -4px 8px var(--neu-light),
 		inset 0 1px 1px rgba(255,255,255,0.08),
 		inset 0 -1px 1px rgba(0,0,0,0.1);
+	--background: #131316;
+	--card: #131316;
+	--popover: #131316;
+	--muted: #201f23;
+	--accent: #201f23;
+	--border: #201f23;
 }
 
 /* Modern: Typography - clean sans-serif */
@@ -589,12 +594,12 @@
 
 /* Modern: Links */
 .modern a {
-	color: var(--neu-accent, hsl(15, 85%, 58%));
+	color: var(--neu-accent, #2040a0);
 	text-decoration: none;
 	transition: opacity 0.2s;
 }
 .modern a:visited {
-	color: var(--neu-accent, hsl(15, 85%, 58%));
+	color: var(--neu-accent, #2040a0);
 	opacity: 0.8;
 }
 .modern a:hover {
@@ -829,17 +834,24 @@
    font-family/font-size or any property that affects element sizing.
    ========================================================== */
 .portal-modern {
-	--neu-bg: #e2dfe5;
-	--neu-light: #f0edf3;
-	--neu-dark: #c4c1c7;
+	--neu-bg: #dcd9de;
+	--neu-light: #ebe7ec;
+	--neu-dark: #c8c5d0;
 	--neu-shadow: 6px 6px 12px var(--neu-dark), -6px -6px 12px var(--neu-light);
 	--neu-shadow-sm: 3px 3px 6px var(--neu-dark), -3px -3px 6px var(--neu-light);
 	--neu-shadow-button:
 		4px 4px 8px var(--neu-dark), -4px -4px 8px var(--neu-light),
 		inset 0 1px 1px rgba(255,255,255,0.3), inset 0 -1px 1px rgba(0,0,0,0.05);
-	--neu-accent: hsl(15, 85%, 58%);
+	--neu-accent: #5455a9;
+	/* Override shadcn surface tokens to match neu-bg for uniform neumorphism */
+	--background: #dcd9de;
+	--card: #dcd9de;
+	--popover: #dcd9de;
+	--muted: #c8c5d0;
+	--accent: #c8c5d0;
+	--border: #c8c5d0;
 	background: var(--neu-bg);
-	color: #444;
+	color: #1c1b1f;
 }
 
 /* Cards: neumorphic look, keep border-width for layout */
@@ -859,7 +871,7 @@
 	border-color: transparent !important;
 	border-radius: 0.75rem;
 	box-shadow: var(--neu-shadow-button);
-	color: #444;
+	color: #1c1b1f;
 }
 
 /* Profile image */
@@ -918,7 +930,7 @@
 	background: none !important;
 	-webkit-background-clip: unset !important;
 	background-clip: unset !important;
-	color: #444;
+	color: #1c1b1f;
 }
 .portal-modern .marquee-content {
 	animation: none !important;
@@ -971,7 +983,7 @@
 	border-radius: 0.75rem;
 	background: var(--neu-bg);
 	box-shadow: inset 3px 3px 6px var(--neu-dark), inset -3px -3px 6px var(--neu-light);
-	color: #444;
+	color: #1c1b1f;
 }
 
 /* Embedded content: ambient placeholder in portal */
@@ -1048,16 +1060,23 @@
 
 /* Dark mode */
 :root.dark .portal-modern {
-	--neu-bg: #2d2b31;
-	--neu-light: #3a383e;
-	--neu-dark: #1e1c22;
+	--neu-bg: #131316;
+	--neu-light: #201f23;
+	--neu-dark: #0e0e11;
 	--neu-shadow: 6px 6px 12px var(--neu-dark), -6px -6px 12px var(--neu-light);
 	--neu-shadow-sm: 3px 3px 6px var(--neu-dark), -3px -3px 6px var(--neu-light);
 	--neu-shadow-button:
 		4px 4px 8px var(--neu-dark), -4px -4px 8px var(--neu-light),
 		inset 0 1px 1px rgba(255,255,255,0.08), inset 0 -1px 1px rgba(0,0,0,0.1);
+	/* Override shadcn surface tokens to match neu-bg */
+	--background: #131316;
+	--card: #131316;
+	--popover: #131316;
+	--muted: #201f23;
+	--accent: #201f23;
+	--border: #201f23;
 	background: var(--neu-bg);
-	color: #ddd;
+	color: #e5e1e6;
 }
 :root.dark .portal-modern .under-construction { color: #aaa; }
 :root.dark .portal-modern .under-construction::before {
@@ -1067,13 +1086,13 @@
 		var(--neu-bg) 20px, var(--neu-bg) 40px
 	);
 }
-:root.dark .portal-modern .text-rainbow-animated { color: #ddd; }
-:root.dark .portal-modern .button-3d { color: #ddd; }
+:root.dark .portal-modern .text-rainbow-animated { color: #e5e1e6; }
+:root.dark .portal-modern .button-3d { color: #e5e1e6; }
 :root.dark .portal-modern .retro-italic { color: #888; }
 :root.dark .portal-modern input[type="password"],
 :root.dark .portal-modern input[type="text"],
 :root.dark .portal-modern input[type="email"],
-:root.dark .portal-modern textarea { color: #ddd; }
+:root.dark .portal-modern textarea { color: #e5e1e6; }
 
 /* ===== Retro custom cursor ===== */
 html:not(.modern) {

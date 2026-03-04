@@ -4,7 +4,7 @@
 	import { Button, Badge } from '$lib/components/ui';
 	import { Twitter, Github, Facebook, AppWindow, Menu, X } from 'lucide-svelte';
 	import { reveal, magneticContainer, typewriter, cursorGhost } from '$lib/actions';
-	import { projectSelection, cssEditorState } from '$lib/stores/portal';
+	import { projectSelection, cssEditorState, styleSwapped } from '$lib/stores/portal';
 
 	let scrollPercent = $state(0);
 	const sectionIds = ['about', 'skills', 'projects', 'jobs', 'publications', 'contact'];
@@ -129,6 +129,23 @@
 			})
 			: data.projects
 	);
+
+	// Sync body background when style-swapped (neumorphism covers full width)
+	$effect(() => {
+		const swapped = $styleSwapped;
+		function sync() {
+			if (swapped) {
+				const isDark = document.documentElement.classList.contains('dark');
+				document.body.style.background = isDark ? '#131316' : '#dcd9de';
+			} else {
+				document.body.style.background = '';
+			}
+		}
+		sync();
+		const obs = new MutationObserver(sync);
+		obs.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+		return () => { obs.disconnect(); document.body.style.background = ''; };
+	});
 
 	onMount(() => {
 		const saved = localStorage.getItem('lang');
@@ -431,7 +448,7 @@
 </header>
 
 <!-- Retro version (normal page) -->
-<main class="site-main retro-text mx-auto max-w-5xl overflow-hidden px-4" use:cursorGhost>
+<main class="site-main retro-text mx-auto max-w-5xl overflow-hidden px-4" class:portal-modern={$styleSwapped} use:cursorGhost>
 	{@render pageContent(false)}
 </main>
 

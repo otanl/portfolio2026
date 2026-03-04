@@ -63,3 +63,31 @@ export function getYouTubeThumbnailUrl(url: string): string | null {
 	}
 	return null;
 }
+
+// --- Color helpers ---
+
+export function hexToRgb(hex: string): [number, number, number] {
+	const n = parseInt(hex.replace('#', ''), 16);
+	return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+}
+
+export function rgbToHex(r: number, g: number, b: number): string {
+	return '#' + [r, g, b].map(c => Math.max(0, Math.min(255, Math.round(c))).toString(16).padStart(2, '0')).join('');
+}
+
+export function lighten(hex: string, amount: number): string {
+	const [r, g, b] = hexToRgb(hex);
+	return rgbToHex(r + (255 - r) * amount, g + (255 - g) * amount, b + (255 - b) * amount);
+}
+
+export function darken(hex: string, amount: number): string {
+	const [r, g, b] = hexToRgb(hex);
+	return rgbToHex(r * (1 - amount), g * (1 - amount), b * (1 - amount));
+}
+
+/** Returns black or white depending on background luminance */
+export function contrastText(hex: string): string {
+	const [r, g, b] = hexToRgb(hex);
+	const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+	return lum > 0.5 ? '#000000' : '#ffffff';
+}

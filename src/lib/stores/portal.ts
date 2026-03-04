@@ -16,6 +16,9 @@ export const projectSelection = writable<{
 	currentSlideIndex: {}
 });
 
+/** Style swap state: when true, main page gets neumorphic, portal gets retro */
+export const styleSwapped = writable<boolean>(false);
+
 /** Shared CSS editor state for portal windows */
 export const cssEditorState = writable<{
 	open: boolean;
