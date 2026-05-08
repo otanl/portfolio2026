@@ -9,8 +9,10 @@
 
 	const t = $derived(lang === 'ja'
 		? {
-			conference: '学会発表',
+			conference: '論文・発表',
 			articles: '記事',
+			lesVenue: 'IEEE Embedded Systems Letters、単著',
+			arxivVenue: 'arXiv プレプリント、単著',
 			nov2025Venue: '第117回IPSJ-MBL研究会・第103回IPSJ-ITS研究会合同研究発表会（愛知県 日間賀島サービスセンター）、単著',
 			award: '奨励発表賞受賞',
 			oct2025Venue: '2025 IEEE International Symposium on Mixed and Augmented Reality（韓国 大田コンベンションセンター）、単著',
@@ -23,8 +25,10 @@
 			coauthors: '共著者: 小林 茂, 桑久保 亮太, 松井 茂, 大谷 芳之, 張 心祈, 仁泉 大輔'
 		}
 		: {
-			conference: 'Conference Presentations',
+			conference: 'Articles & Presentations',
 			articles: 'Articles',
+			lesVenue: 'IEEE Embedded Systems Letters, sole author',
+			arxivVenue: 'arXiv preprint, sole author',
 			nov2025Venue: 'The 117th IPSJ-MBL / The 103rd IPSJ-ITS Joint Workshop (Himakajima Service Center, Aichi), sole author',
 			award: 'Encouragement Presentation Award',
 			oct2025Venue: '2025 IEEE International Symposium on Mixed and Augmented Reality (Daejeon Convention Center, Korea), sole author',
@@ -44,6 +48,42 @@
 
 	<h3 class="mb-6 text-2xl font-bold">{t.conference}</h3>
 	<ul class="space-y-6">
+		<li class="border-b border-current pb-4">
+			<div class="flex items-start gap-2">
+				<span class="shrink-0 font-bold tabular-nums">2026.05</span>
+				<div>
+					<p class="font-bold"><a href="https://doi.org/10.1109/LES.2026.3691130" target="_blank" rel="noopener noreferrer">On-Device iOS UWB Localization under Angle Dropout: Comparing GPU PF/FGO with Range-Only Estimation</a></p>
+					<p class="mt-1 text-sm">{t.lesVenue}</p>
+				</div>
+			</div>
+		</li>
+		<li class="border-b border-current pb-4">
+			<div class="flex items-start gap-2">
+				<span class="shrink-0 font-bold tabular-nums">2026.04</span>
+				<div>
+					<p class="font-bold"><a href="https://arxiv.org/abs/2604.03902" target="_blank" rel="noopener noreferrer">Search-Bound Proximity Proofs: Binding Encrypted Geographic Search to Zero-Knowledge Verification</a></p>
+					<p class="mt-1 text-sm">{t.arxivVenue}</p>
+				</div>
+			</div>
+		</li>
+		<li class="border-b border-current pb-4">
+			<div class="flex items-start gap-2">
+				<span class="shrink-0 font-bold tabular-nums">2026.04</span>
+				<div>
+					<p class="font-bold"><a href="https://arxiv.org/abs/2604.03900" target="_blank" rel="noopener noreferrer">Context-Binding Gaps in Stateful Zero-Knowledge Proximity Proofs: Taxonomy, Separation, and Mitigation</a></p>
+					<p class="mt-1 text-sm">{t.arxivVenue}</p>
+				</div>
+			</div>
+		</li>
+		<li class="border-b border-current pb-4">
+			<div class="flex items-start gap-2">
+				<span class="shrink-0 font-bold tabular-nums">2026.04</span>
+				<div>
+					<p class="font-bold"><a href="https://arxiv.org/abs/2604.03896" target="_blank" rel="noopener noreferrer">Graduated Trust Gating for IoT Location Verification: Trading Off Detection and Proof Escalation</a></p>
+					<p class="mt-1 text-sm">{t.arxivVenue}</p>
+				</div>
+			</div>
+		</li>
 		<li class="border-b border-current pb-4">
 			<div class="flex items-start gap-2">
 				<span class="shrink-0 font-bold tabular-nums">2025.11</span>
